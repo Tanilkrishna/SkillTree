@@ -5,17 +5,23 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { TreePine, Trophy, TrendingUp, BookOpen, LogOut, Network, Link as LinkIcon } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { TreePine, Trophy, TrendingUp, BookOpen, LogOut, Network, Link as LinkIcon, Award, Star, Zap, Layers, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import * as LucideIcons from 'lucide-react';
 
 export default function Dashboard({ user, onLogout }) {
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [recommendations, setRecommendations] = useState(null);
   const [loadingRecs, setLoadingRecs] = useState(false);
+  const [achievements, setAchievements] = useState([]);
+  const [activities, setActivities] = useState([]);
 
   useEffect(() => {
     fetchStats();
+    fetchAchievements();
+    fetchActivities();
   }, []);
 
   const fetchStats = async () => {
@@ -24,6 +30,24 @@ export default function Dashboard({ user, onLogout }) {
       setStats(response.data);
     } catch (error) {
       toast.error('Failed to load stats');
+    }
+  };
+
+  const fetchAchievements = async () => {
+    try {
+      const response = await axios.get(`${API}/achievements`);
+      setAchievements(response.data);
+    } catch (error) {
+      console.error('Failed to load achievements');
+    }
+  };
+
+  const fetchActivities = async () => {
+    try {
+      const response = await axios.get(`${API}/activity-feed`);
+      setActivities(response.data);
+    } catch (error) {
+      console.error('Failed to load activities');
     }
   };
 
@@ -37,6 +61,17 @@ export default function Dashboard({ user, onLogout }) {
       toast.error('Failed to get recommendations');
     }
     setLoadingRecs(false);
+  };
+
+  const getIconComponent = (iconName) => {
+    const Icon = LucideIcons[iconName];
+    return Icon ? <Icon className="w-4 h-4" /> : <LucideIcons.Trophy className="w-4 h-4" />;
+  };
+
+  const formatTimestamp = (timestamp) => {
+    if (!timestamp) return '';
+    const date = new Date(timestamp);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
   const progressToNextLevel = stats ? ((stats.total_xp % 1000) / 1000) * 100 : 0;
