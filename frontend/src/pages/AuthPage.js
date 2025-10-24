@@ -41,7 +41,7 @@ const AuthPage = ({ onLogin }) => {
       toast.success('Successfully logged in with Google!');
       window.history.replaceState({}, document.title, window.location.pathname);
     } catch (error) {
-      toast.error('OAuth authentication failed. Please try again or use email/password.');
+      toast.error('OAuth authentication failed. Please try again.');
       console.error('OAuth error:', error);
     } finally {
       setProcessingOAuth(false);
