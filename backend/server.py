@@ -152,39 +152,6 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     return user
 
 # ============= AUTH ROUTES =============
-@api_router.post("/auth/register")
-async def register(data: UserRegister):
-    existing = await db.users.find_one({'email': data.email})
-    if existing:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    
-    user_id = str(uuid.uuid4())
-    user_doc = {
-        'id': user_id,
-        'email': data.email,
-        'password_hash': hash_password(data.password),
-        'name': data.name,
-        'picture': None,
-        'xp': 0,
-        'level': 1,
-        'auth_type': 'jwt',
-        'created_at': datetime.now(timezone.utc).isoformat()
-    }
-    
-    await db.users.insert_one(user_doc)
-    token = create_token(user_id)
-    
-    return {'token': token, 'user': {'id': user_id, 'email': data.email, 'name': data.name, 'picture': None, 'xp': 0, 'level': 1}}
-
-@api_router.post("/auth/login")
-async def login(data: UserLogin):
-    user = await db.users.find_one({'email': data.email})
-    if not user or not user.get('password_hash') or not verify_password(data.password, user['password_hash']):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-    
-    token = create_token(user['id'])
-    return {'token': token, 'user': {'id': user['id'], 'email': user['email'], 'name': user['name'], 'picture': user.get('picture'), 'xp': user['xp'], 'level': user['level']}}
-
 @api_router.get("/auth/me")
 async def get_me(request: Request):
     current_user = await get_current_user_from_request(request)
