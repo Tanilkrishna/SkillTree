@@ -151,6 +151,14 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         raise HTTPException(status_code=401, detail="User not found")
     return user
 
+async def get_admin_user(request: Request) -> dict:
+    """Get current user and verify they are an admin"""
+    current_user = await get_current_user_from_request(request)
+    if not current_user.get('is_admin', False):
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return current_user
+
+
 # ============= AUTH ROUTES =============
 @api_router.get("/auth/me")
 async def get_me(request: Request):
