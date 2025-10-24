@@ -96,6 +96,11 @@ const IntegrationsPage = ({ user, onLogout }) => {
             <Button variant="ghost" className="text-white" onClick={() => navigate('/integrations')} data-testid="integrations-nav">
               Integrations
             </Button>
+            {user?.is_admin && (
+              <Button variant="ghost" className="text-yellow-300 font-semibold" onClick={() => navigate('/admin')} data-testid="admin-nav">
+                ⚡ Admin
+              </Button>
+            )}
             <Avatar className="w-10 h-10">
               <AvatarImage src={user.picture} />
               <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
