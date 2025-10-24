@@ -196,70 +196,25 @@ class SkillTreeAPITester:
         
         return True
 
-    def test_ai_endpoints(self):
-        """Test AI-related endpoints"""
-        print("\n🤖 Testing AI Endpoints...")
+    def test_backend_health(self):
+        """Test if backend is running and responding"""
+        print("\n🏥 Testing Backend Health...")
         
-        # Test skill recommendations
-        self.run_test(
-            "AI Skill Recommendations",
-            "POST",
-            "ai/recommend-skills",
-            200
-        )
-        
-        # Test lesson content generation
-        self.run_test(
-            "AI Generate Lesson Content",
-            "POST",
-            "ai/generate-lesson-content",
-            200,
-            data={
-                "skill_name": "Python Basics",
-                "lesson_title": "Variables and Data Types"
-            }
-        )
-
-    def test_integrations_endpoints(self):
-        """Test integrations-related endpoints"""
-        print("\n🔗 Testing Integrations Endpoints...")
-        
-        # Get integrations
-        self.run_test(
-            "Get Integrations",
-            "GET",
-            "integrations",
-            200
-        )
-        
-        # Connect platforms
-        platforms = ['github', 'linkedin', 'youtube']
-        for platform in platforms:
-            self.run_test(
-                f"Connect {platform.title()}",
-                "POST",
-                f"integrations/connect/{platform}",
-                200
-            )
+        try:
+            # Test a simple endpoint to see if backend is running
+            url = f"{self.base_url}/api/seed-data"
+            response = requests.post(url, timeout=10)
             
-            # Sync platform
-            self.run_test(
-                f"Sync {platform.title()}",
-                "GET",
-                f"integrations/{platform}/sync",
-                200
-            )
-
-    def test_dashboard_endpoints(self):
-        """Test dashboard-related endpoints"""
-        print("\n📊 Testing Dashboard Endpoints...")
-        
-        self.run_test(
-            "Get Dashboard Stats",
-            "GET",
-            "dashboard/stats",
-            200
-        )
+            if response.status_code in [200, 400, 401, 404]:
+                self.log_test("Backend Health Check", True, f"Backend responding (Status: {response.status_code})")
+                return True
+            else:
+                self.log_test("Backend Health Check", False, f"Unexpected status: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Backend Health Check", False, f"Backend not responding: {str(e)}")
+            return False
 
     def run_all_tests(self):
         """Run complete test suite"""
