@@ -27,7 +27,6 @@ const AuthPage = ({ onLogin }) => {
         }
       } catch (error) {
         // If parsing fails, just clear the hash
-        console.log('Invalid URL hash, clearing:', error);
         window.history.replaceState({}, document.title, window.location.pathname);
       }
     }
