@@ -200,11 +200,11 @@ async def get_skill(skill_id: str, current_user: dict = Depends(get_current_user
 
 @api_router.post("/user-skills/{skill_id}/start")
 async def start_skill(skill_id: str, current_user: dict = Depends(get_current_user)):
-    skill = await db.skills.find_one({'id': skill_id})
+    skill = await db.skills.find_one({'id': skill_id}, {'_id': 0})
     if not skill:
         raise HTTPException(status_code=404, detail="Skill not found")
     
-    existing = await db.user_skills.find_one({'user_id': current_user['id'], 'skill_id': skill_id})
+    existing = await db.user_skills.find_one({'user_id': current_user['id'], 'skill_id': skill_id}, {'_id': 0})
     if existing:
         raise HTTPException(status_code=400, detail="Skill already started")
     
