@@ -300,16 +300,16 @@ async def complete_lesson(lesson_id: str, current_user: dict = Depends(get_curre
     
     # Update skill progress
     skill_id = lesson['skill_id']
-    all_lessons = await db.lessons.find({'skill_id': skill_id}).to_list(1000)
+    all_lessons = await db.lessons.find({'skill_id': skill_id}, {'_id': 0}).to_list(1000)
     completed_lessons = await db.user_lessons.find({
         'user_id': current_user['id'],
         'lesson_id': {'$in': [l['id'] for l in all_lessons]},
         'completed': True
-    }).to_list(1000)
+    }, {'_id': 0}).to_list(1000)
     
     progress_percent = int((len(completed_lessons) / len(all_lessons)) * 100) if all_lessons else 0
     
-    user_skill = await db.user_skills.find_one({'user_id': current_user['id'], 'skill_id': skill_id})
+    user_skill = await db.user_skills.find_one({'user_id': current_user['id'], 'skill_id': skill_id}, {'_id': 0})
     if user_skill:
         await db.user_skills.update_one(
             {'id': user_skill['id']},
