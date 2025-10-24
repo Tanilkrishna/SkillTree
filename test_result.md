@@ -209,17 +209,17 @@ backend:
         comment: "Comprehensive stats: XP, level, completion rate, skills in progress"
 
 frontend:
-  - task: "Authentication Pages (Login/Register)"
+  - task: "Authentication Page (Google OAuth Only)"
     implemented: true
     working: true
     file: "frontend/src/pages/AuthPage.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: true
         agent: "main"
-        comment: "Beautiful gradient auth page with tabs for login/register"
+        comment: "UPDATED: Simplified auth page to only show Google OAuth login. Removed email/password forms, removed login/register tabs. Clean UI with single 'Continue with Google' button. OAuth callback handling intact."
 
   - task: "Dashboard with Stats and Achievements"
     implemented: true
