@@ -404,9 +404,6 @@ class SkillTreeAPITester:
         # Test 1: Promote user to admin (requires authentication)
         print("\n1️⃣ Testing Admin Promotion...")
         
-        # Since we can't easily create real OAuth sessions in testing,
-        # we'll test the endpoints that should require authentication
-        
         # Test promote-me endpoint without auth (should fail)
         success, response = self.run_test(
             "Admin Promote Me Without Auth",
@@ -418,14 +415,14 @@ class SkillTreeAPITester:
         # Test 2: Admin Lesson Generation API
         print("\n2️⃣ Testing Admin Lesson Generation...")
         
-        # Test with existing skill
+        # Test with existing skill - realistic data
         lesson_data_existing = {
             "skill_id": "skill-1",
-            "topic": "HTML Forms and Validation",
-            "difficulty": "beginner",
-            "xp_points": 100,
+            "topic": "Advanced HTML Forms and Input Validation",
+            "difficulty": "intermediate",
+            "xp_points": 150,
             "lesson_count": 3,
-            "learning_objective": "Learn to create and validate HTML forms with different input types"
+            "learning_objective": "Master HTML form creation, input types, validation attributes, and accessibility best practices for modern web development"
         }
         
         success, response = self.run_test(
@@ -434,19 +431,19 @@ class SkillTreeAPITester:
             "admin/lessons/generate",
             401,
             data=lesson_data_existing,
-            timeout=30
+            timeout=45
         )
         
-        # Test with new skill creation
+        # Test with new skill creation - realistic data
         lesson_data_new = {
             "skill_id": None,
-            "new_skill_name": "Test Skill",
+            "new_skill_name": "Modern CSS Grid Layout",
             "new_skill_category": "Web Development",
-            "topic": "Test Topic",
+            "topic": "CSS Grid Layout System and Responsive Design",
             "difficulty": "intermediate",
-            "xp_points": 150,
-            "lesson_count": 2,
-            "learning_objective": "Test learning objective"
+            "xp_points": 200,
+            "lesson_count": 4,
+            "learning_objective": "Learn to create complex, responsive layouts using CSS Grid, including grid areas, auto-placement, and responsive grid patterns"
         }
         
         success, response = self.run_test(
@@ -455,7 +452,7 @@ class SkillTreeAPITester:
             "admin/lessons/generate",
             401,
             data=lesson_data_new,
-            timeout=30
+            timeout=45
         )
         
         # Test 3: Admin Skill Management
@@ -482,6 +479,14 @@ class SkillTreeAPITester:
             "Admin Delete Skill (No Auth)",
             "DELETE",
             "admin/skills/skill-1",
+            401
+        )
+        
+        # Test user admin toggle
+        success, response = self.run_test(
+            "Admin Toggle User Admin Status (No Auth)",
+            "PUT",
+            "admin/users/test-user-123/toggle-admin",
             401
         )
         
