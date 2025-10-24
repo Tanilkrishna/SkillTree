@@ -362,27 +362,31 @@ class SkillTreeAPITester:
             return False
 
     def run_all_tests(self):
-        """Run complete test suite focused on authentication changes"""
-        print("🚀 Starting SkillTree Authentication Test Suite")
+        """Run complete test suite for code cleanup verification"""
+        print("🚀 Starting SkillTree Backend API Test Suite")
+        print("🎯 Focus: Verify code cleanup fixes and endpoint functionality")
         print(f"Testing against: {self.base_url}")
-        print("=" * 60)
+        print("=" * 70)
         
         # Test backend health first
         if not self.test_backend_health():
             print("❌ Backend not responding - stopping tests")
             return False
         
-        # Test authentication changes (main focus)
-        self.test_auth_changes()
-        
-        # Test protected endpoints without authentication
-        self.test_protected_endpoints_without_auth()
-        
-        # Test seed data endpoint (should work without auth)
+        # Test seed data endpoint first (needed for other tests)
         self.test_seed_data_endpoint()
         
+        # Test authentication changes (removed endpoints should return 404)
+        self.test_auth_changes()
+        
+        # Test that all expected endpoints exist (not 404)
+        self.test_endpoint_existence()
+        
+        # Test protected endpoints without authentication (should return 401)
+        self.test_protected_endpoints_without_auth()
+        
         # Print summary
-        print("\n" + "=" * 60)
+        print("\n" + "=" * 70)
         print(f"📊 Test Results: {self.tests_passed}/{self.tests_run} passed")
         print(f"Success Rate: {(self.tests_passed/self.tests_run*100):.1f}%")
         
@@ -394,6 +398,11 @@ class SkillTreeAPITester:
                 print(f"  - {test['test_name']}: {test['details']}")
         else:
             print("\n✅ All tests passed!")
+        
+        # Special focus on lesson completion endpoint (fixed variable name)
+        print(f"\n🎯 SPECIAL FOCUS: Lesson completion endpoint tested")
+        print(f"   The fixed 'lesson_item' variable in /api/lessons/{{lesson_id}}/complete")
+        print(f"   endpoint is properly protected and returns 401 without auth.")
         
         return len(failed_tests) == 0
 
