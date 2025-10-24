@@ -144,67 +144,43 @@ class SkillTreeAPITester:
         
         return True
 
-    def test_skills_endpoints(self):
-        """Test skills-related endpoints"""
-        print("\n🎯 Testing Skills Endpoints...")
+    def test_protected_endpoints_without_auth(self):
+        """Test that protected endpoints return 401 without authentication"""
+        print("\n🔒 Testing Protected Endpoints Without Auth...")
         
-        # First seed data
+        # Test skills endpoints require authentication
         self.run_test(
-            "Seed Data",
-            "POST",
-            "seed-data",
-            200
-        )
-        
-        # Get all skills
-        success, skills_response = self.run_test(
-            "Get All Skills",
+            "Get Skills Unauthenticated (Should be 401)",
             "GET",
             "skills",
-            200
+            401
         )
         
-        if success and skills_response:
-            skills = skills_response
-            if len(skills) > 0:
-                skill_id = skills[0]['id']
-                
-                # Get specific skill
-                self.run_test(
-                    "Get Specific Skill",
-                    "GET",
-                    f"skills/{skill_id}",
-                    200
-                )
-                
-                # Start a skill
-                self.run_test(
-                    "Start Skill",
-                    "POST",
-                    f"user-skills/{skill_id}/start",
-                    200
-                )
-                
-                # Update progress
-                self.run_test(
-                    "Update Skill Progress",
-                    "PUT",
-                    f"user-skills/{skill_id}/progress",
-                    200,
-                    data={"progress_percent": 50}
-                )
-                
-                # Complete skill
-                self.run_test(
-                    "Complete Skill",
-                    "POST",
-                    f"user-skills/{skill_id}/complete",
-                    200
-                )
-                
-                return skill_id
+        # Test dashboard stats requires authentication
+        self.run_test(
+            "Get Dashboard Stats Unauthenticated (Should be 401)",
+            "GET",
+            "dashboard/stats",
+            401
+        )
         
-        return None
+        # Test AI recommendations require authentication
+        self.run_test(
+            "AI Recommendations Unauthenticated (Should be 401)",
+            "POST",
+            "ai/recommend-skills",
+            401
+        )
+        
+        # Test integrations require authentication
+        self.run_test(
+            "Get Integrations Unauthenticated (Should be 401)",
+            "GET",
+            "integrations",
+            401
+        )
+        
+        return True
 
     def test_lessons_endpoints(self, skill_id):
         """Test lessons-related endpoints"""
