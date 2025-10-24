@@ -22,7 +22,8 @@ const AuthPage = ({ onLogin }) => {
     if (hash) {
       const params = new URLSearchParams(hash.substring(1));
       const sessionId = params.get('session_id');
-      if (sessionId) {
+      // Only process OAuth if we actually have a session_id
+      if (sessionId && sessionId.trim().length > 0) {
         handleOAuthCallback(sessionId);
       }
     }
@@ -32,11 +33,12 @@ const AuthPage = ({ onLogin }) => {
     setProcessingOAuth(true);
     try {
       const response = await axios.post(`${API}/auth/oauth/session`, { session_id: sessionId }, { withCredentials: true });
-      onLogin(response.data.user, 'oauth');
+      onLogin(response.data.user, response.data.token);
+      toast.success('Successfully logged in with Google!');
       window.history.replaceState({}, document.title, window.location.pathname);
     } catch (error) {
-      toast.error('OAuth authentication failed');
-      console.error(error);
+      toast.error('OAuth authentication failed. Please try again or use email/password.');
+      console.error('OAuth error:', error);
     } finally {
       setProcessingOAuth(false);
     }
