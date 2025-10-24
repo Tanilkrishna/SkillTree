@@ -75,6 +75,11 @@ const Dashboard = ({ user, onLogout }) => {
             <Button variant="ghost" className="text-white" onClick={() => navigate('/integrations')} data-testid="integrations-nav-button">
               Integrations
             </Button>
+            {user?.is_admin && (
+              <Button variant="ghost" className="text-yellow-300 font-semibold" onClick={() => navigate('/admin')} data-testid="admin-nav-button">
+                ⚡ Admin
+              </Button>
+            )}
             <Avatar className="w-10 h-10" data-testid="user-avatar">
               <AvatarImage src={user.picture} />
               <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
