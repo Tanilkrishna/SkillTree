@@ -421,7 +421,7 @@ async def connect_platform(platform: str, current_user: dict = Depends(get_curre
 
 @api_router.get("/integrations/{platform}/sync")
 async def sync_platform(platform: str, current_user: dict = Depends(get_current_user)):
-    connection = await db.external_connections.find_one({'user_id': current_user['id'], 'platform': platform})
+    connection = await db.external_connections.find_one({'user_id': current_user['id'], 'platform': platform}, {'_id': 0})
     if not connection or not connection['connected']:
         raise HTTPException(status_code=400, detail="Platform not connected")
     
