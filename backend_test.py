@@ -553,12 +553,20 @@ class SkillTreeAPITester:
         ]
         
         for method, endpoint in endpoints_to_check:
+            # Special case for admin/lessons/generate - it validates request body first
+            if endpoint == "admin/lessons/generate":
+                expected_status = 422  # Pydantic validation happens before auth
+                test_data = {}
+            else:
+                expected_status = 401  # Should be 401 (auth required), not 404 (not found)
+                test_data = {} if method == "POST" else None
+            
             success, response = self.run_test(
                 f"Endpoint Exists: {method} {endpoint}",
                 method,
                 endpoint,
-                401,  # Should be 401 (auth required), not 404 (not found)
-                data={} if method == "POST" else None
+                expected_status,
+                data=test_data
             )
         
         return True
