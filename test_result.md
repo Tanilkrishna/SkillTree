@@ -103,7 +103,9 @@
 #====================================================================================================
 
 user_problem_statement: |
-  **LATEST REQUEST**: Remove Emergent email/password authentication. Use only Google OAuth for login/register.
+  **LATEST REQUEST**: Add admin page with AI-powered lesson generation. Admins can create lessons using AI by providing topic, difficulty, XP, lesson count, and learning objectives. Remove all hardcoded lessons - only admin-generated lessons remain.
+  
+  Previous request: Remove Emergent email/password authentication. Use only Google OAuth for login/register.
   
   Original request: Build a SaaS web platform called SkillTree, an AI-powered learning and progress-tracking system 
   that visualizes users' skill development as a gamified skill tree. The system connects to external 
