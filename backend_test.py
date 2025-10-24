@@ -2,11 +2,20 @@ import requests
 import sys
 import json
 from datetime import datetime
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv('/app/frontend/.env')
 
 class SkillTreeAPITester:
-    def __init__(self, base_url="http://localhost:8001"):
-        self.base_url = base_url
-        self.token = None
+    def __init__(self, base_url=None):
+        if base_url is None:
+            # Use the production URL from frontend/.env
+            self.base_url = os.getenv('REACT_APP_BACKEND_URL', 'https://dev-journey-103.preview.emergentagent.com')
+        else:
+            self.base_url = base_url
+        self.session_token = None
         self.user_id = None
         self.tests_run = 0
         self.tests_passed = 0
