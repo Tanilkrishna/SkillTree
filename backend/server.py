@@ -849,6 +849,7 @@ async def generate_lessons(data: AdminLessonGenerateRequest, request: Request):
             raise HTTPException(status_code=404, detail="Skill not found")
     
     # Generate lessons using AI
+    import json
     try:
         emergent_key = os.environ.get('EMERGENT_LLM_KEY')
         if not emergent_key:
@@ -891,7 +892,6 @@ Make sure the content is educational, practical, and appropriate for {data.diffi
         response = llm.chat([UserMessage(content=prompt)])
         
         # Parse AI response
-        import json
         response_text = response.content.strip()
         
         # Extract JSON from response (handle markdown code blocks)
