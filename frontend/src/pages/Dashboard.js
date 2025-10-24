@@ -1,270 +1,215 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { API } from '@/App';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { TreePine, Trophy, TrendingUp, BookOpen, LogOut, Network, Link as LinkIcon, Award, Star, Zap, Layers, CheckCircle } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { TreePine, Trophy, Target, Zap, BookOpen, GitBranch, LogOut, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
-import * as LucideIcons from 'lucide-react';
 
-export default function Dashboard({ user, onLogout }) {
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
+
+const Dashboard = ({ user, onLogout }) => {
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
-  const [recommendations, setRecommendations] = useState(null);
-  const [loadingRecs, setLoadingRecs] = useState(false);
   const [achievements, setAchievements] = useState([]);
-  const [activities, setActivities] = useState([]);
+  const [activityFeed, setActivityFeed] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchStats();
-    fetchAchievements();
-    fetchActivities();
+    fetchDashboardData();
   }, []);
 
-  const fetchStats = async () => {
+  const fetchDashboardData = async () => {
     try {
-      const response = await axios.get(`${API}/dashboard/stats`);
-      setStats(response.data);
+      const [statsRes, achievementsRes, activityRes] = await Promise.all([
+        axios.get(`${API}/dashboard/stats`, { withCredentials: true }),
+        axios.get(`${API}/achievements`, { withCredentials: true }),
+        axios.get(`${API}/activity-feed`, { withCredentials: true })
+      ]);
+      setStats(statsRes.data);
+      setAchievements(achievementsRes.data);
+      setActivityFeed(activityRes.data);
     } catch (error) {
-      toast.error('Failed to load stats');
+      toast.error('Failed to load dashboard data');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const fetchAchievements = async () => {
+  const handleLogout = async () => {
     try {
-      const response = await axios.get(`${API}/achievements`);
-      setAchievements(response.data);
+      await axios.post(`${API}/auth/logout`, {}, { withCredentials: true });
+      onLogout();
     } catch (error) {
-      console.error('Failed to load achievements');
+      onLogout();
     }
   };
 
-  const fetchActivities = async () => {
-    try {
-      const response = await axios.get(`${API}/activity-feed`);
-      setActivities(response.data);
-    } catch (error) {
-      console.error('Failed to load activities');
-    }
-  };
-
-  const getRecommendations = async () => {
-    setLoadingRecs(true);
-    try {
-      const response = await axios.post(`${API}/ai/recommend-skills`);
-      setRecommendations(response.data);
-      toast.success('AI recommendations loaded!');
-    } catch (error) {
-      toast.error('Failed to get recommendations');
-    }
-    setLoadingRecs(false);
-  };
-
-  const getIconComponent = (iconName) => {
-    const Icon = LucideIcons[iconName];
-    return Icon ? <Icon className="w-4 h-4" /> : <LucideIcons.Trophy className="w-4 h-4" />;
-  };
-
-  const formatTimestamp = (timestamp) => {
-    if (!timestamp) return '';
-    const date = new Date(timestamp);
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  };
-
-  const progressToNextLevel = stats ? ((stats.total_xp % 1000) / 1000) * 100 : 0;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-pulse text-white text-xl">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10" data-testid="dashboard-header">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <TreePine className="w-8 h-8 text-purple-600" />
-              <h1 className="text-2xl font-bold">SkillTree</h1>
-            </div>
-            <nav className="flex items-center gap-4">
-              <Button variant="ghost" onClick={() => navigate('/dashboard')} data-testid="nav-dashboard-btn">Dashboard</Button>
-              <Button variant="ghost" onClick={() => navigate('/skill-tree')} data-testid="nav-skill-tree-btn">Skill Tree</Button>
-              <Button variant="ghost" onClick={() => navigate('/integrations')} data-testid="nav-integrations-btn">Integrations</Button>
-              <Button variant="outline" size="sm" onClick={onLogout} data-testid="logout-btn">
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
-              </Button>
-            </nav>
+      <header className="bg-white/10 backdrop-blur-md border-b border-white/20" data-testid="dashboard-header">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/dashboard')}>
+            <TreePine className="w-8 h-8 text-white" />
+            <h1 className="text-2xl font-bold text-white">SkillTree</h1>
           </div>
+          <nav className="flex items-center gap-4">
+            <Button variant="ghost" className="text-white" onClick={() => navigate('/dashboard')} data-testid="dashboard-nav-button">
+              Dashboard
+            </Button>
+            <Button variant="ghost" className="text-white" onClick={() => navigate('/skill-tree')} data-testid="skill-tree-nav-button">
+              Skill Tree
+            </Button>
+            <Button variant="ghost" className="text-white" onClick={() => navigate('/integrations')} data-testid="integrations-nav-button">
+              Integrations
+            </Button>
+            <Avatar className="w-10 h-10" data-testid="user-avatar">
+              <AvatarImage src={user.picture} />
+              <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
+            </Avatar>
+            <Button variant="ghost" size="icon" onClick={handleLogout} data-testid="logout-button">
+              <LogOut className="w-5 h-5 text-white" />
+            </Button>
+          </nav>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" data-testid="dashboard-main">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-2">Welcome back, {user.name}! 👋</h2>
-          <p className="text-gray-600">Continue your learning journey</p>
-        </div>
+      <main className="max-w-7xl mx-auto px-4 py-8" data-testid="dashboard-main">
+        {/* User Profile Card */}
+        <Card className="p-6 mb-8 bg-white/95 backdrop-blur-sm" data-testid="profile-card">
+          <div className="flex items-center gap-6">
+            <Avatar className="w-24 h-24">
+              <AvatarImage src={user.picture} />
+              <AvatarFallback className="text-3xl">{user.name.charAt(0).toUpperCase()}</AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <h2 className="text-3xl font-bold mb-2" data-testid="user-name">{user.name}</h2>
+              <p className="text-gray-600 mb-3" data-testid="user-email">{user.email}</p>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <Zap className="w-5 h-5 text-yellow-500" />
+                  <span className="font-semibold" data-testid="user-level">Level {stats.level}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Trophy className="w-5 h-5 text-purple-500" />
+                  <span className="font-semibold" data-testid="user-xp">{stats.total_xp} XP</span>
+                </div>
+              </div>
+            </div>
+            <Button size="lg" onClick={() => navigate('/skill-tree')} data-testid="explore-skills-button">
+              <TreePine className="w-5 h-5 mr-2" />
+              Explore Skills
+            </Button>
+          </div>
+        </Card>
 
         {/* Stats Grid */}
-        {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <Card className="card-hover" data-testid="level-card">
-              <CardHeader className="pb-2">
-                <CardDescription>Current Level</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-3">
-                  <Trophy className="w-8 h-8 text-yellow-500" />
-                  <div>
-                    <div className="text-3xl font-bold">{stats.level}</div>
-                    <div className="text-sm text-gray-600">{stats.total_xp} XP</div>
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <Progress value={progressToNextLevel} className="h-2" />
-                  <p className="text-xs text-gray-500 mt-1">{Math.round(progressToNextLevel)}% to level {stats.level + 1}</p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="card-hover" data-testid="completed-skills-card">
-              <CardHeader className="pb-2">
-                <CardDescription>Skills Completed</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-3">
-                  <BookOpen className="w-8 h-8 text-green-500" />
-                  <div className="text-3xl font-bold">{stats.skills_completed}</div>
-                </div>
-                <p className="text-sm text-gray-600 mt-2">Out of {stats.total_skills} total skills</p>
-              </CardContent>
-            </Card>
-
-            <Card className="card-hover" data-testid="in-progress-card">
-              <CardHeader className="pb-2">
-                <CardDescription>In Progress</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-3">
-                  <TrendingUp className="w-8 h-8 text-blue-500" />
-                  <div className="text-3xl font-bold">{stats.skills_in_progress}</div>
-                </div>
-                <p className="text-sm text-gray-600 mt-2">Active learning tracks</p>
-              </CardContent>
-            </Card>
-
-            <Card className="card-hover" data-testid="completion-rate-card">
-              <CardHeader className="pb-2">
-                <CardDescription>Completion Rate</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-3">
-                  <Network className="w-8 h-8 text-purple-500" />
-                  <div className="text-3xl font-bold">{stats.completion_rate}%</div>
-                </div>
-                <p className="text-sm text-gray-600 mt-2">Overall progress</p>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <Card data-testid="quick-actions-card">
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-              <CardDescription>Jump into your learning journey</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/skill-tree')} data-testid="view-skill-tree-btn">
-                <Network className="w-4 h-4 mr-2" />
-                View Skill Tree
-              </Button>
-              <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/integrations')} data-testid="connect-platforms-btn">
-                <LinkIcon className="w-4 h-4 mr-2" />
-                Connect Learning Platforms
-              </Button>
-            </CardContent>
+        <div className="grid md:grid-cols-4 gap-6 mb-8">
+          <Card className="p-6 bg-gradient-to-br from-blue-500 to-blue-600 text-white" data-testid="stat-card-completed">
+            <Target className="w-8 h-8 mb-3" />
+            <p className="text-sm opacity-90">Skills Completed</p>
+            <p className="text-3xl font-bold">{stats.skills_completed}</p>
           </Card>
-
-          <Card data-testid="ai-recommendations-card">
-            <CardHeader>
-              <CardTitle>AI Recommendations</CardTitle>
-              <CardDescription>Get personalized skill suggestions</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {!recommendations ? (
-                <Button onClick={getRecommendations} disabled={loadingRecs} className="w-full" data-testid="get-recommendations-btn">
-                  {loadingRecs ? 'Loading...' : 'Get AI Recommendations'}
-                </Button>
-              ) : (
-                <div className="space-y-3" data-testid="recommendations-list">
-                  <p className="text-sm text-gray-600 whitespace-pre-wrap">{recommendations.recommendations}</p>
-                  <Button onClick={getRecommendations} variant="outline" size="sm" disabled={loadingRecs} data-testid="refresh-recommendations-btn">
-                    Refresh Recommendations
-                  </Button>
-                </div>
-              )}
-            </CardContent>
+          <Card className="p-6 bg-gradient-to-br from-purple-500 to-purple-600 text-white" data-testid="stat-card-progress">
+            <BookOpen className="w-8 h-8 mb-3" />
+            <p className="text-sm opacity-90">In Progress</p>
+            <p className="text-3xl font-bold">{stats.skills_in_progress}</p>
+          </Card>
+          <Card className="p-6 bg-gradient-to-br from-green-500 to-green-600 text-white" data-testid="stat-card-completion">
+            <Trophy className="w-8 h-8 mb-3" />
+            <p className="text-sm opacity-90">Completion Rate</p>
+            <p className="text-3xl font-bold">{stats.completion_rate}%</p>
+          </Card>
+          <Card className="p-6 bg-gradient-to-br from-orange-500 to-orange-600 text-white" data-testid="stat-card-total">
+            <GitBranch className="w-8 h-8 mb-3" />
+            <p className="text-sm opacity-90">Total Skills</p>
+            <p className="text-3xl font-bold">{stats.total_skills}</p>
           </Card>
         </div>
 
-        {/* Achievements */}
-        <div className="mb-8">
-          <h3 className="text-2xl font-bold mb-4">Achievements 🏆</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4" data-testid="achievements-grid">
-            {achievements.map((achievement) => (
-              <Card
-                key={achievement.id}
-                className={`text-center card-hover ${!achievement.unlocked ? 'opacity-50 grayscale' : ''}`}
-                data-testid={`achievement-${achievement.id}`}
-              >
-                <CardContent className="pt-6">
-                  <div className={`inline-flex p-4 rounded-full mb-3 ${achievement.unlocked ? 'bg-yellow-100' : 'bg-gray-100'}`}>
-                    {getIconComponent(achievement.icon)}
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Achievements */}
+          <Card className="p-6" data-testid="achievements-section">
+            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <Trophy className="w-6 h-6 text-yellow-500" />
+              Achievements
+            </h3>
+            <div className="space-y-3">
+              {achievements.map((achievement) => (
+                <div
+                  key={achievement.id}
+                  className={`flex items-center gap-4 p-3 rounded-lg border-2 transition-all ${
+                    achievement.unlocked
+                      ? 'bg-green-50 border-green-200'
+                      : 'bg-gray-50 border-gray-200 opacity-60'
+                  }`}
+                  data-testid={`achievement-${achievement.id}`}
+                >
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                    achievement.unlocked ? 'bg-green-100' : 'bg-gray-100'
+                  }`}>
+                    <Trophy className={`w-6 h-6 ${
+                      achievement.unlocked ? 'text-green-600' : 'text-gray-400'
+                    }`} />
                   </div>
-                  <h4 className="font-semibold text-sm mb-1">{achievement.name}</h4>
-                  <p className="text-xs text-gray-600">{achievement.description}</p>
+                  <div className="flex-1">
+                    <p className="font-semibold">{achievement.name}</p>
+                    <p className="text-sm text-gray-600">{achievement.description}</p>
+                  </div>
                   {achievement.unlocked && (
-                    <Badge variant="secondary" className="mt-2 bg-green-100 text-green-800">
-                      <CheckCircle className="w-3 h-3 mr-1" />
-                      Unlocked
-                    </Badge>
+                    <span className="text-green-600 font-semibold">Unlocked!</span>
                   )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
+                </div>
+              ))}
+            </div>
+          </Card>
 
-        {/* Activity Feed */}
-        {activities.length > 0 && (
-          <Card data-testid="activity-feed-card">
-            <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
-              <CardDescription>Your learning journey timeline</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4" data-testid="activity-list">
-                {activities.map((activity, index) => (
-                  <div key={index} className="flex items-start gap-3 pb-4 border-b last:border-0" data-testid={`activity-${index}`}>
-                    <div className="p-2 bg-green-100 rounded-full">
-                      {getIconComponent(activity.icon)}
+          {/* Activity Feed */}
+          <Card className="p-6" data-testid="activity-feed-section">
+            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <Sparkles className="w-6 h-6 text-purple-500" />
+              Recent Activity
+            </h3>
+            {activityFeed.length > 0 ? (
+              <div className="space-y-3">
+                {activityFeed.map((activity, idx) => (
+                  <div key={idx} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg" data-testid={`activity-item-${idx}`}>
+                    <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                      <Trophy className="w-5 h-5 text-purple-600" />
                     </div>
                     <div className="flex-1">
-                      <p className="font-semibold text-sm">{activity.title}</p>
-                      <p className="text-xs text-gray-600">{activity.description}</p>
-                      <p className="text-xs text-gray-500 mt-1">{formatTimestamp(activity.timestamp)}</p>
+                      <p className="font-medium">{activity.title}</p>
+                      <p className="text-sm text-gray-600">{activity.description}</p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        {new Date(activity.timestamp).toLocaleDateString()}
+                      </p>
                     </div>
                   </div>
                 ))}
               </div>
-            </CardContent>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <p>No recent activity</p>
+                <p className="text-sm mt-2">Start learning to see your progress here!</p>
+              </div>
+            )}
           </Card>
-        )}
+        </div>
       </main>
     </div>
   );
-}
+};
+
+export default Dashboard;
