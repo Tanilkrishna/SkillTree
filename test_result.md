@@ -382,9 +382,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Google OAuth authentication flow"
-    - "Backend OAuth session endpoint"
-    - "Frontend Google login button and callback"
+    - "Admin system with is_admin field"
+    - "Admin lesson generation with AI (GPT-4o-mini)"
+    - "Admin page UI and form validation"
+    - "Admin route protection"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
