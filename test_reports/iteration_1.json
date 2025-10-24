@@ -29,7 +29,7 @@
         "issue": "Frontend making API calls to wrong backend URL causing CORS errors",
         "impact": "All skill-related actions fail - core functionality broken",
         "fix_priority": "CRITICAL",
-        "error_details": "XMLHttpRequest blocked by CORS policy - calling 'https://code-cleanup-54.preview.emergentagent.com' instead of correct backend URL",
+        "error_details": "XMLHttpRequest blocked by CORS policy - calling 'https://oneshot-run.preview.emergentagent.com' instead of correct backend URL",
         "affected_flows": ["Start Skill", "Complete Skill", "Lesson Management"]
       }
     ],
