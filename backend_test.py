@@ -40,24 +40,21 @@ class SkillTreeAPITester:
         if details:
             print(f"    Details: {details}")
 
-    def run_test(self, name, method, endpoint, expected_status, data=None, headers=None):
+    def run_test(self, name, method, endpoint, expected_status, data=None, headers=None, cookies=None):
         """Run a single API test"""
         url = f"{self.base_url}/api/{endpoint}"
         test_headers = {'Content-Type': 'application/json'}
-        
-        if self.token:
-            test_headers['Authorization'] = f'Bearer {self.token}'
         
         if headers:
             test_headers.update(headers)
 
         try:
             if method == 'GET':
-                response = requests.get(url, headers=test_headers, timeout=10)
+                response = requests.get(url, headers=test_headers, cookies=cookies, timeout=10)
             elif method == 'POST':
-                response = requests.post(url, json=data, headers=test_headers, timeout=10)
+                response = requests.post(url, json=data, headers=test_headers, cookies=cookies, timeout=10)
             elif method == 'PUT':
-                response = requests.put(url, json=data, headers=test_headers, timeout=10)
+                response = requests.put(url, json=data, headers=test_headers, cookies=cookies, timeout=10)
 
             success = response.status_code == expected_status
             details = f"Status: {response.status_code}, Expected: {expected_status}"
@@ -77,7 +74,7 @@ class SkillTreeAPITester:
                 except:
                     return True, {}
             else:
-                return False, {}
+                return False, response
 
         except Exception as e:
             self.log_test(name, False, f"Exception: {str(e)}")
