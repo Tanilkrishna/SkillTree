@@ -300,6 +300,32 @@ frontend:
         agent: "main"
         comment: "Enhanced dashboard with level progress, stats cards, achievements grid, activity feed, AI recommendations"
 
+
+  - task: "Admin Page with AI Lesson Generator"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/AdminPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Created comprehensive admin page with form for AI lesson generation. Features: skill selection dropdown (existing or new), topic input, difficulty selector, XP points, lesson count, learning objective textarea. Shows generated lessons with titles, content, duration, and resources. Only accessible to users with is_admin=true."
+
+  - task: "Admin Navigation Link"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/Dashboard.js, SkillTreePage.js, IntegrationsPage.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added '⚡ Admin' navigation button to all main pages (Dashboard, Skill Tree, Integrations). Button only visible to users with is_admin=true. Links to /admin route."
+
+
   - task: "Skill Tree Visualization"
     implemented: true
     working: true
