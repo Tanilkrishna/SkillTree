@@ -155,39 +155,14 @@ class SkillTreeAPITester:
 
     def test_protected_endpoints_without_auth(self):
         """Test that protected endpoints return 401 without authentication"""
-        print("\n🔒 Testing Protected Endpoints Without Auth...")
+        print("\n🔒 Testing All Protected Endpoints Without Auth...")
         
-        # Test skills endpoints require authentication
-        self.run_test(
-            "Get Skills Unauthenticated (Should be 401)",
-            "GET",
-            "skills",
-            401
-        )
-        
-        # Test dashboard stats requires authentication
-        self.run_test(
-            "Get Dashboard Stats Unauthenticated (Should be 401)",
-            "GET",
-            "dashboard/stats",
-            401
-        )
-        
-        # Test AI recommendations require authentication
-        self.run_test(
-            "AI Recommendations Unauthenticated (Should be 401)",
-            "POST",
-            "ai/recommend-skills",
-            401
-        )
-        
-        # Test integrations require authentication
-        self.run_test(
-            "Get Integrations Unauthenticated (Should be 401)",
-            "GET",
-            "integrations",
-            401
-        )
+        # Test all endpoint categories
+        self.test_skills_endpoints_without_auth()
+        self.test_lessons_endpoints_without_auth()
+        self.test_ai_endpoints_without_auth()
+        self.test_integrations_endpoints_without_auth()
+        self.test_dashboard_endpoints_without_auth()
         
         return True
 
