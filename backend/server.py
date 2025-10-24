@@ -889,7 +889,8 @@ Format your response as a JSON array with this exact structure:
 
 Make sure the content is educational, practical, and appropriate for {data.difficulty} level learners."""
 
-        response = llm.chat([UserMessage(content=prompt)])
+        user_message = UserMessage(text=prompt)
+        response = await llm.send_message(user_message)
         
         # Parse AI response
         response_text = response.content.strip()
