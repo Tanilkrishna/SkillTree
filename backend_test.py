@@ -11,8 +11,8 @@ load_dotenv('/app/frontend/.env')
 class SkillTreeAPITester:
     def __init__(self, base_url=None):
         if base_url is None:
-            # Use the production URL from frontend/.env
-            self.base_url = os.getenv('REACT_APP_BACKEND_URL', 'https://dev-journey-103.preview.emergentagent.com')
+            # Test against internal backend URL since we're running inside the container
+            self.base_url = "http://localhost:8001"
         else:
             self.base_url = base_url
         self.session_token = None
