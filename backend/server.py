@@ -34,15 +34,6 @@ api_router = APIRouter(prefix="/api")
 security = HTTPBearer()
 
 # ============= MODELS =============
-class UserRegister(BaseModel):
-    email: EmailStr
-    password: str
-    name: str
-
-class UserLogin(BaseModel):
-    email: EmailStr
-    password: str
-
 class User(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str
