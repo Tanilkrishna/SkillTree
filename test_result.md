@@ -391,13 +391,13 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Admin system with is_admin field"
-    - "Admin lesson generation with AI (GPT-4o-mini)"
-    - "Admin page UI and form validation"
-    - "Admin route protection"
+    - "Comprehensive backend testing - all API endpoints"
+    - "Admin system verification - AI lesson generation"
+    - "Frontend UI testing - Dashboard, Admin Page, Skill Tree"
+    - "End-to-end workflow validation"
   stuck_tasks: []
-  test_all: false
-  test_priority: "high_first"
+  test_all: true
+  test_priority: "backend_first_then_frontend"
 
 agent_communication:
   - agent: "main"
