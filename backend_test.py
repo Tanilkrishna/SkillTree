@@ -80,55 +80,69 @@ class SkillTreeAPITester:
             self.log_test(name, False, f"Exception: {str(e)}")
             return False, {}
 
-    def test_auth_flow(self):
-        """Test complete authentication flow"""
-        print("\n🔐 Testing Authentication Flow...")
+    def test_auth_changes(self):
+        """Test authentication changes - removed endpoints should return 404"""
+        print("\n🔐 Testing Authentication Changes...")
         
-        # Test registration
-        test_email = f"test_{datetime.now().strftime('%H%M%S')}@example.com"
+        # Test that /auth/register returns 404 (should be removed)
         register_data = {
-            "email": test_email,
+            "email": "test@example.com",
             "password": "TestPass123!",
             "name": "Test User"
         }
         
-        success, response = self.run_test(
-            "User Registration",
+        self.run_test(
+            "Auth Register Endpoint (Should be 404)",
             "POST",
             "auth/register",
-            200,
+            404,
             data=register_data
         )
         
-        if success and 'token' in response:
-            self.token = response['token']
-            self.user_id = response['user']['id']
-            
-            # Test login with same credentials
-            login_data = {
-                "email": test_email,
-                "password": "TestPass123!"
-            }
-            
-            success, response = self.run_test(
-                "User Login",
-                "POST",
-                "auth/login",
-                200,
-                data=login_data
-            )
-            
-            # Test get current user
-            self.run_test(
-                "Get Current User",
-                "GET",
-                "auth/me",
-                200
-            )
-            
-            return True
+        # Test that /auth/login returns 404 (should be removed)
+        login_data = {
+            "email": "test@example.com",
+            "password": "TestPass123!"
+        }
         
-        return False
+        self.run_test(
+            "Auth Login Endpoint (Should be 404)",
+            "POST",
+            "auth/login",
+            404,
+            data=login_data
+        )
+        
+        # Test /auth/oauth/session exists but fails with invalid session_id
+        oauth_data = {
+            "session_id": "invalid_session_id_12345"
+        }
+        
+        self.run_test(
+            "OAuth Session with Invalid ID (Should fail)",
+            "POST",
+            "auth/oauth/session",
+            400,  # Should return 400 for invalid session_id
+            data=oauth_data
+        )
+        
+        # Test /auth/me returns 401 for unauthenticated users
+        self.run_test(
+            "Get Current User Unauthenticated (Should be 401)",
+            "GET",
+            "auth/me",
+            401
+        )
+        
+        # Test /auth/logout works (should return success even without session)
+        self.run_test(
+            "Logout Endpoint",
+            "POST",
+            "auth/logout",
+            200
+        )
+        
+        return True
 
     def test_skills_endpoints(self):
         """Test skills-related endpoints"""
