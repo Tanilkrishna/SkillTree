@@ -10,7 +10,6 @@ from pydantic import BaseModel, Field, ConfigDict, EmailStr
 from typing import List, Optional, Dict, Any
 import uuid
 from datetime import datetime, timezone, timedelta
-import bcrypt
 import jwt
 import httpx
 from emergentintegrations.llm.chat import LlmChat, UserMessage
