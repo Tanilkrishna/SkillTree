@@ -642,6 +642,22 @@ class SkillTreeAPITester:
         """Test if backend is running and responding"""
         print("\n🏥 Testing Backend Health...")
         
+        try:
+            # Test a simple endpoint to see if backend is running
+            url = f"{self.base_url}/api/seed-data"
+            response = requests.post(url, timeout=10)
+            
+            if response.status_code in [200, 400, 401, 404]:
+                self.log_test("Backend Health Check", True, f"Backend responding (Status: {response.status_code})")
+                return True
+            else:
+                self.log_test("Backend Health Check", False, f"Unexpected status: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Backend Health Check", False, f"Backend not responding: {str(e)}")
+            return False
+
     def test_emergent_llm_integration(self):
         """Test if EMERGENT_LLM_KEY is properly configured"""
         print("\n🤖 Testing Emergent LLM Integration...")
