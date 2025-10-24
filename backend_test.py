@@ -165,6 +165,7 @@ class SkillTreeAPITester:
         self.test_ai_endpoints_without_auth()
         self.test_integrations_endpoints_without_auth()
         self.test_dashboard_endpoints_without_auth()
+        self.test_admin_endpoints_without_auth()
         
         return True
 
