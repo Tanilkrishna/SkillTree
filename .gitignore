@@ -82,3 +82,8 @@ frontend/node_modules/.cache/default-development/1.pack
 myfolder.zip
 frontend/node_modules/.cache/default-development/0.pack
 App.zip
+-e 
+# Environment files
+*.env
+*.env.*
+app.zip
