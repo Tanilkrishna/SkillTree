@@ -399,7 +399,7 @@ async def connect_platform(platform: str, current_user: dict = Depends(get_curre
         'youtube': {'subscribed_channels': 25, 'learning_playlists': 12, 'watch_time_hours': 156}
     }
     
-    existing = await db.external_connections.find_one({'user_id': current_user['id'], 'platform': platform})
+    existing = await db.external_connections.find_one({'user_id': current_user['id'], 'platform': platform}, {'_id': 0})
     
     if existing:
         await db.external_connections.update_one(
