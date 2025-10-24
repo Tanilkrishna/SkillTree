@@ -41,7 +41,6 @@ const AuthPage = ({ onLogin }) => {
       window.history.replaceState({}, document.title, window.location.pathname);
     } catch (error) {
       toast.error('OAuth authentication failed. Please try again.');
-      console.error('OAuth error:', error);
     } finally {
       setProcessingOAuth(false);
     }
