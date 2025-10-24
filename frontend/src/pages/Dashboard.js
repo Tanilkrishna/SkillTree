@@ -201,7 +201,7 @@ export default function Dashboard({ user, onLogout }) {
                 </Button>
               ) : (
                 <div className="space-y-3" data-testid="recommendations-list">
-                  <p className="text-sm text-gray-600">{recommendations.recommendations}</p>
+                  <p className="text-sm text-gray-600 whitespace-pre-wrap">{recommendations.recommendations}</p>
                   <Button onClick={getRecommendations} variant="outline" size="sm" disabled={loadingRecs} data-testid="refresh-recommendations-btn">
                     Refresh Recommendations
                   </Button>
@@ -210,6 +210,60 @@ export default function Dashboard({ user, onLogout }) {
             </CardContent>
           </Card>
         </div>
+
+        {/* Achievements */}
+        <div className="mb-8">
+          <h3 className="text-2xl font-bold mb-4">Achievements 🏆</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4" data-testid="achievements-grid">
+            {achievements.map((achievement) => (
+              <Card
+                key={achievement.id}
+                className={`text-center card-hover ${!achievement.unlocked ? 'opacity-50 grayscale' : ''}`}
+                data-testid={`achievement-${achievement.id}`}
+              >
+                <CardContent className="pt-6">
+                  <div className={`inline-flex p-4 rounded-full mb-3 ${achievement.unlocked ? 'bg-yellow-100' : 'bg-gray-100'}`}>
+                    {getIconComponent(achievement.icon)}
+                  </div>
+                  <h4 className="font-semibold text-sm mb-1">{achievement.name}</h4>
+                  <p className="text-xs text-gray-600">{achievement.description}</p>
+                  {achievement.unlocked && (
+                    <Badge variant="secondary" className="mt-2 bg-green-100 text-green-800">
+                      <CheckCircle className="w-3 h-3 mr-1" />
+                      Unlocked
+                    </Badge>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Activity Feed */}
+        {activities.length > 0 && (
+          <Card data-testid="activity-feed-card">
+            <CardHeader>
+              <CardTitle>Recent Activity</CardTitle>
+              <CardDescription>Your learning journey timeline</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4" data-testid="activity-list">
+                {activities.map((activity, index) => (
+                  <div key={index} className="flex items-start gap-3 pb-4 border-b last:border-0" data-testid={`activity-${index}`}>
+                    <div className="p-2 bg-green-100 rounded-full">
+                      {getIconComponent(activity.icon)}
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-sm">{activity.title}</p>
+                      <p className="text-xs text-gray-600">{activity.description}</p>
+                      <p className="text-xs text-gray-500 mt-1">{formatTimestamp(activity.timestamp)}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </main>
     </div>
   );
