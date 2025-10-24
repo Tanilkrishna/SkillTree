@@ -893,7 +893,7 @@ Make sure the content is educational, practical, and appropriate for {data.diffi
         response = await llm.send_message(user_message)
         
         # Parse AI response
-        response_text = response.content.strip()
+        response_text = str(response).strip()
         
         # Extract JSON from response (handle markdown code blocks)
         if '```json' in response_text:
