@@ -3,7 +3,7 @@ import json
 from datetime import datetime
 
 class AdditionalAPITester:
-    def __init__(self, base_url="https://dev-journey-103.preview.emergentagent.com"):
+    def __init__(self, base_url="https://code-cleanup-54.preview.emergentagent.com"):
         self.base_url = base_url
         self.token = None
         
