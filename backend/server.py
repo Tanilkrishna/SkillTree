@@ -41,6 +41,7 @@ class User(BaseModel):
     picture: Optional[str] = None
     xp: int = 0
     level: int = 1
+    is_admin: bool = False
     created_at: str
     auth_type: str = "jwt"  # jwt or oauth
 
