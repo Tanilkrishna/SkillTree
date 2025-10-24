@@ -257,6 +257,15 @@ class SkillTreeAPITester:
             data={"skill_name": "Python", "lesson_title": "Variables"}
         )
         
+        # Test /api/ai/generate-quiz
+        self.run_test(
+            "AI Generate Quiz Unauthenticated (Should be 401)",
+            "POST",
+            "ai/generate-quiz",
+            401,
+            data={"skill_name": "JavaScript", "lesson_content": "Variables and data types"}
+        )
+        
         return True
 
     def test_integrations_endpoints_without_auth(self):
