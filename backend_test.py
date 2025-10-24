@@ -555,8 +555,11 @@ class SkillTreeAPITester:
             ("POST", "lessons/lesson-1-1/complete"),
             ("POST", "ai/recommend-skills"),
             ("POST", "ai/generate-lesson-content"),
+            ("POST", "ai/generate-quiz"),
             ("GET", "integrations"),
             ("POST", "integrations/github/connect"),
+            ("POST", "integrations/linkedin/connect"),
+            ("POST", "integrations/youtube/connect"),
             ("GET", "dashboard/stats"),
             ("GET", "achievements"),
             ("GET", "activity-feed"),
@@ -564,7 +567,8 @@ class SkillTreeAPITester:
             ("GET", "admin/skills"),
             ("POST", "admin/lessons/generate"),
             ("DELETE", "admin/lessons/lesson-1-1"),
-            ("DELETE", "admin/skills/skill-1")
+            ("DELETE", "admin/skills/skill-1"),
+            ("PUT", "admin/users/test-user-123/toggle-admin")
         ]
         
         for method, endpoint in endpoints_to_check:
