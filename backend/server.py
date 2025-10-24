@@ -449,6 +449,10 @@ async def get_dashboard_stats(current_user: dict = Depends(get_current_user)):
     }
 
 # ============= ACHIEVEMENTS & ACTIVITY =============
+@api_router.get("/test-route")
+async def test_route():
+    return {"message": "Test route works"}
+
 @api_router.get("/achievements")
 async def get_achievements(current_user: dict = Depends(get_current_user)):
     user_skills = await db.user_skills.find({'user_id': current_user['id']}, {'_id': 0}).to_list(1000)
