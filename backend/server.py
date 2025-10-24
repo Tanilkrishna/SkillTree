@@ -857,9 +857,9 @@ async def generate_lessons(data: AdminLessonGenerateRequest, request: Request):
         
         llm = LlmChat(
             api_key=emergent_key,
-            model="gpt-4o-mini",
-            temperature=0.7
-        )
+            session_id=f"admin_lesson_gen_{datetime.now(timezone.utc).timestamp()}",
+            system_message="You are an expert educational content creator. Generate comprehensive, engaging lessons with practical examples and clear explanations."
+        ).with_model("openai", "gpt-4o-mini")
         
         prompt = f"""You are an expert educational content creator. Generate {data.lesson_count} detailed lessons for the following topic:
 
