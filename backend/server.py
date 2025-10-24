@@ -897,9 +897,26 @@ Make sure the content is educational, practical, and appropriate for {data.diffi
         
         # Extract JSON from response (handle markdown code blocks)
         if '```json' in response_text:
-            response_text = response_text.split('```json')[1].split('```')[0].strip()
+            json_start = response_text.find('```json') + 7
+            json_end = response_text.find('```', json_start)
+            if json_end != -1:
+                response_text = response_text[json_start:json_end].strip()
         elif '```' in response_text:
-            response_text = response_text.split('```')[1].split('```')[0].strip()
+            json_start = response_text.find('```') + 3
+            json_end = response_text.find('```', json_start)
+            if json_end != -1:
+                response_text = response_text[json_start:json_end].strip()
+        
+        # If no JSON blocks found, try to find JSON array directly
+        if not response_text.startswith('['):
+            # Look for JSON array in the response
+            start_idx = response_text.find('[')
+            end_idx = response_text.rfind(']')
+            if start_idx != -1 and end_idx != -1:
+                response_text = response_text[start_idx:end_idx+1]
+        
+        if not response_text:
+            raise ValueError("No JSON content found in AI response")
         
         lessons_data = json.loads(response_text)
         
