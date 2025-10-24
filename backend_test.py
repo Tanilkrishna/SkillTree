@@ -544,7 +544,12 @@ class SkillTreeAPITester:
             ("POST", "integrations/github/connect"),
             ("GET", "dashboard/stats"),
             ("GET", "achievements"),
-            ("GET", "activity-feed")
+            ("GET", "activity-feed"),
+            ("POST", "admin/promote-me"),
+            ("GET", "admin/skills"),
+            ("POST", "admin/lessons/generate"),
+            ("DELETE", "admin/lessons/lesson-1-1"),
+            ("DELETE", "admin/skills/skill-1")
         ]
         
         for method, endpoint in endpoints_to_check:
