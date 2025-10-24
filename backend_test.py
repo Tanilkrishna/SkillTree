@@ -309,6 +309,61 @@ class SkillTreeAPITester:
         
         return True
 
+    def test_admin_endpoints_without_auth(self):
+        """Test admin endpoints without authentication (should return 401)"""
+        print("\n⚡ Testing Admin Endpoints Without Auth...")
+        
+        # Test /api/admin/promote-me
+        self.run_test(
+            "Admin Promote Me Unauthenticated (Should be 401)",
+            "POST",
+            "admin/promote-me",
+            401
+        )
+        
+        # Test /api/admin/skills
+        self.run_test(
+            "Admin Get Skills Unauthenticated (Should be 401)",
+            "GET",
+            "admin/skills",
+            401
+        )
+        
+        # Test /api/admin/lessons/generate
+        lesson_data = {
+            "skill_id": "skill-1",
+            "topic": "Test Topic",
+            "difficulty": "beginner",
+            "xp_points": 100,
+            "lesson_count": 2,
+            "learning_objective": "Test objective"
+        }
+        self.run_test(
+            "Admin Generate Lessons Unauthenticated (Should be 401)",
+            "POST",
+            "admin/lessons/generate",
+            401,
+            data=lesson_data
+        )
+        
+        # Test /api/admin/lessons/{lesson_id} DELETE
+        self.run_test(
+            "Admin Delete Lesson Unauthenticated (Should be 401)",
+            "DELETE",
+            "admin/lessons/lesson-1-1",
+            401
+        )
+        
+        # Test /api/admin/skills/{skill_id} DELETE
+        self.run_test(
+            "Admin Delete Skill Unauthenticated (Should be 401)",
+            "DELETE",
+            "admin/skills/skill-1",
+            401
+        )
+        
+        return True
+
     def test_endpoint_existence(self):
         """Test that all expected endpoints exist (not 404)"""
         print("\n🔍 Testing Endpoint Existence...")
