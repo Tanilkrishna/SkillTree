@@ -163,7 +163,7 @@ async def get_admin_user(request: Request) -> dict:
 @api_router.get("/auth/me")
 async def get_me(request: Request):
     current_user = await get_current_user_from_request(request)
-    return {'id': current_user['id'], 'email': current_user['email'], 'name': current_user['name'], 'picture': current_user.get('picture'), 'xp': current_user['xp'], 'level': current_user['level'], 'auth_type': current_user.get('auth_type', 'jwt')}
+    return {'id': current_user['id'], 'email': current_user['email'], 'name': current_user['name'], 'picture': current_user.get('picture'), 'xp': current_user['xp'], 'level': current_user['level'], 'is_admin': current_user.get('is_admin', False), 'auth_type': current_user.get('auth_type', 'jwt')}
 
 # OAuth Routes
 @api_router.post("/auth/oauth/session")
