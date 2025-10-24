@@ -688,6 +688,9 @@ class SkillTreeAPITester:
         # Test comprehensive admin system
         self.test_admin_system_comprehensive()
         
+        # Test admin AI lesson generation with mock auth
+        self.test_admin_ai_lesson_generation_with_mock_auth()
+        
         # Print summary
         print("\n" + "=" * 70)
         print(f"📊 Test Results: {self.tests_passed}/{self.tests_run} passed")
