@@ -805,6 +805,179 @@ async def seed_data():
     
     return {'message': 'Data seeded successfully', 'skills_count': len(skills_data), 'lessons_count': len(lessons_data)}
 
+
+# ============= ADMIN ROUTES =============
+class AdminLessonGenerateRequest(BaseModel):
+    skill_id: Optional[str] = None  # If None, create new skill
+    new_skill_name: Optional[str] = None
+    new_skill_category: Optional[str] = None
+    topic: str
+    difficulty: str  # beginner, intermediate, advanced
+    xp_points: int
+    lesson_count: int
+    learning_objective: str
+
+@api_router.post("/admin/lessons/generate")
+async def generate_lessons(data: AdminLessonGenerateRequest, request: Request):
+    """Admin-only: Generate lessons using AI"""
+    admin_user = await get_admin_user(request)
+    
+    # If creating a new skill
+    if not data.skill_id:
+        if not data.new_skill_name or not data.new_skill_category:
+            raise HTTPException(status_code=400, detail="new_skill_name and new_skill_category required for new skills")
+        
+        # Create new skill
+        skill_id = str(uuid.uuid4())
+        skill_doc = {
+            'id': skill_id,
+            'name': data.new_skill_name,
+            'description': f"Learn {data.new_skill_name} - {data.topic}",
+            'category': data.new_skill_category,
+            'difficulty': data.difficulty,
+            'prerequisites': [],
+            'xp_value': data.xp_points,
+            'icon': '🎓',
+            'position': {'x': 0, 'y': 0}  # Admin can adjust later
+        }
+        await db.skills.insert_one(skill_doc)
+        skill_id = skill_doc['id']
+    else:
+        skill_id = data.skill_id
+        skill = await db.skills.find_one({'id': skill_id}, {'_id': 0})
+        if not skill:
+            raise HTTPException(status_code=404, detail="Skill not found")
+    
+    # Generate lessons using AI
+    try:
+        emergent_key = os.environ.get('EMERGENT_LLM_KEY')
+        if not emergent_key:
+            raise HTTPException(status_code=500, detail="EMERGENT_LLM_KEY not configured")
+        
+        llm = LlmChat(
+            api_key=emergent_key,
+            model="gpt-4o-mini",
+            temperature=0.7
+        )
+        
+        prompt = f"""You are an expert educational content creator. Generate {data.lesson_count} detailed lessons for the following topic:
+
+Topic: {data.topic}
+Difficulty Level: {data.difficulty}
+Learning Objective: {data.learning_objective}
+XP Points per Lesson: {data.xp_points}
+
+Please create {data.lesson_count} comprehensive lessons that progressively build knowledge. For each lesson, provide:
+1. A clear, engaging title
+2. Detailed content (minimum 200 words) with explanations, examples, and code snippets where applicable
+3. Estimated completion time in minutes
+4. 2-3 relevant external resources (with realistic titles and URLs)
+
+Format your response as a JSON array with this exact structure:
+[
+  {{
+    "title": "Lesson Title",
+    "content": "Detailed lesson content with examples...",
+    "estimated_time": 30,
+    "resources": [
+      {{"title": "Resource Name", "url": "https://example.com"}},
+      {{"title": "Another Resource", "url": "https://example.com"}}
+    ]
+  }}
+]
+
+Make sure the content is educational, practical, and appropriate for {data.difficulty} level learners."""
+
+        response = llm.chat([UserMessage(content=prompt)])
+        
+        # Parse AI response
+        import json
+        response_text = response.content.strip()
+        
+        # Extract JSON from response (handle markdown code blocks)
+        if '```json' in response_text:
+            response_text = response_text.split('```json')[1].split('```')[0].strip()
+        elif '```' in response_text:
+            response_text = response_text.split('```')[1].split('```')[0].strip()
+        
+        lessons_data = json.loads(response_text)
+        
+        # Store lessons in database
+        generated_lessons = []
+        for idx, lesson_data in enumerate(lessons_data):
+            lesson_id = str(uuid.uuid4())
+            lesson_doc = {
+                'id': lesson_id,
+                'skill_id': skill_id,
+                'title': lesson_data['title'],
+                'content': lesson_data['content'],
+                'order': idx + 1,
+                'estimated_time': lesson_data.get('estimated_time', 30),
+                'resources': lesson_data.get('resources', [])
+            }
+            await db.lessons.insert_one(lesson_doc)
+            generated_lessons.append(lesson_doc)
+        
+        return {
+            'message': f'Successfully generated {len(generated_lessons)} lessons',
+            'skill_id': skill_id,
+            'lessons': generated_lessons
+        }
+    
+    except json.JSONDecodeError as e:
+        raise HTTPException(status_code=500, detail=f"Failed to parse AI response: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to generate lessons: {str(e)}")
+
+@api_router.get("/admin/skills")
+async def get_all_skills_admin(request: Request):
+    """Admin-only: Get all skills for dropdown"""
+    await get_admin_user(request)
+    skills = await db.skills.find({}, {'_id': 0, 'id': 1, 'name': 1, 'category': 1}).to_list(1000)
+    return skills
+
+@api_router.delete("/admin/lessons/{lesson_id}")
+async def delete_lesson(lesson_id: str, request: Request):
+    """Admin-only: Delete a lesson"""
+    await get_admin_user(request)
+    result = await db.lessons.delete_one({'id': lesson_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Lesson not found")
+    return {'message': 'Lesson deleted successfully'}
+
+@api_router.delete("/admin/skills/{skill_id}")
+async def delete_skill(skill_id: str, request: Request):
+    """Admin-only: Delete a skill and all its lessons"""
+    await get_admin_user(request)
+    
+    # Delete all lessons for this skill
+    await db.lessons.delete_many({'skill_id': skill_id})
+    
+    # Delete the skill
+    result = await db.skills.delete_one({'id': skill_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Skill not found")
+    
+    return {'message': 'Skill and associated lessons deleted successfully'}
+
+@api_router.put("/admin/users/{user_id}/toggle-admin")
+async def toggle_admin_status(user_id: str, request: Request):
+    """Admin-only: Toggle admin status for a user"""
+    admin_user = await get_admin_user(request)
+    
+    if admin_user['id'] == user_id:
+        raise HTTPException(status_code=400, detail="Cannot modify your own admin status")
+    
+    user = await db.users.find_one({'id': user_id}, {'_id': 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    new_admin_status = not user.get('is_admin', False)
+    await db.users.update_one({'id': user_id}, {'$set': {'is_admin': new_admin_status}})
+    
+    return {'message': f'User admin status updated', 'is_admin': new_admin_status}
+
+
 # Include the router
 app.include_router(api_router)
 
