@@ -87,3 +87,4 @@ App.zip
 *.env
 *.env.*
 app.zip
+.env
