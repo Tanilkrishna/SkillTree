@@ -219,6 +219,8 @@ async def start_skill(skill_id: str, current_user: dict = Depends(get_current_us
     }
     
     await db.user_skills.insert_one(user_skill_doc)
+    # Remove MongoDB's _id field before returning
+    user_skill_doc.pop('_id', None)
     return {'message': 'Skill started', 'user_skill': user_skill_doc}
 
 @api_router.put("/user-skills/{skill_id}/progress")
