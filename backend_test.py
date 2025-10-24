@@ -601,6 +601,12 @@ class SkillTreeAPITester:
         # Test protected endpoints without authentication (should return 401)
         self.test_protected_endpoints_without_auth()
         
+        # Test admin endpoints without authentication
+        self.test_admin_endpoints_without_auth()
+        
+        # Test comprehensive admin system
+        self.test_admin_system_comprehensive()
+        
         # Print summary
         print("\n" + "=" * 70)
         print(f"📊 Test Results: {self.tests_passed}/{self.tests_run} passed")
