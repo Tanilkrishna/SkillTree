@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv('/app/frontend/.env')
+load_dotenv('/app/backend/.env')
 
 class SkillTreeAPITester:
     def __init__(self, base_url=None):
