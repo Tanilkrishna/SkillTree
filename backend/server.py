@@ -278,11 +278,11 @@ async def get_lessons(skill_id: str, current_user: dict = Depends(get_current_us
 
 @api_router.post("/lessons/{lesson_id}/complete")
 async def complete_lesson(lesson_id: str, current_user: dict = Depends(get_current_user)):
-    lesson = await db.lessons.find_one({'id': lesson_id})
+    lesson = await db.lessons.find_one({'id': lesson_id}, {'_id': 0})
     if not lesson:
         raise HTTPException(status_code=404, detail="Lesson not found")
     
-    existing = await db.user_lessons.find_one({'user_id': current_user['id'], 'lesson_id': lesson_id})
+    existing = await db.user_lessons.find_one({'user_id': current_user['id'], 'lesson_id': lesson_id}, {'_id': 0})
     if existing:
         await db.user_lessons.update_one(
             {'id': existing['id']},
