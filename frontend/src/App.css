@@ -197,3 +197,13 @@ h1, h2, h3, h4, h5, h6 {
 .delay-2000 {
   animation-delay: 2s;
 }
+
+/* Shimmer Animation for AI Button */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
