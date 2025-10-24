@@ -64,12 +64,12 @@ function App() {
     <div className="App">
       <BrowserRouter>
         <Routes>
+          <Route path="/" element={!user ? <LandingPage /> : <Navigate to="/dashboard" />} />
           <Route path="/auth" element={!user ? <AuthPage onLogin={handleLogin} /> : <Navigate to="/dashboard" />} />
-          <Route path="/dashboard" element={user ? <Dashboard user={user} onLogout={handleLogout} /> : <Navigate to="/auth" />} />
-          <Route path="/skill-tree" element={user ? <SkillTreePage user={user} onLogout={handleLogout} /> : <Navigate to="/auth" />} />
-          <Route path="/skills/:skillId" element={user ? <SkillDetailPage user={user} onLogout={handleLogout} /> : <Navigate to="/auth" />} />
-          <Route path="/integrations" element={user ? <IntegrationsPage user={user} onLogout={handleLogout} /> : <Navigate to="/auth" />} />
-          <Route path="/" element={<Navigate to={user ? "/dashboard" : "/auth"} />} />
+          <Route path="/dashboard" element={user ? <Dashboard user={user} onLogout={handleLogout} /> : <Navigate to="/" />} />
+          <Route path="/skill-tree" element={user ? <SkillTreePage user={user} onLogout={handleLogout} /> : <Navigate to="/" />} />
+          <Route path="/skills/:skillId" element={user ? <SkillDetailPage user={user} onLogout={handleLogout} /> : <Navigate to="/" />} />
+          <Route path="/integrations" element={user ? <IntegrationsPage user={user} onLogout={handleLogout} /> : <Navigate to="/" />} />
         </Routes>
       </BrowserRouter>
       <Toaster position="top-right" richColors />
