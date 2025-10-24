@@ -17,14 +17,23 @@ const AuthPage = ({ onLogin }) => {
   const [formData, setFormData] = useState({ email: '', password: '', name: '' });
 
   useEffect(() => {
-    // Check for OAuth session_id in URL fragment
+    // Check for OAuth session_id in URL fragment ONLY if explicitly present
     const hash = window.location.hash;
-    if (hash) {
-      const params = new URLSearchParams(hash.substring(1));
-      const sessionId = params.get('session_id');
-      // Only process OAuth if we actually have a session_id
-      if (sessionId && sessionId.trim().length > 0) {
-        handleOAuthCallback(sessionId);
+    if (hash && hash.length > 1) {
+      try {
+        const params = new URLSearchParams(hash.substring(1));
+        const sessionId = params.get('session_id');
+        // Only process OAuth if we have a valid session_id (not just any hash)
+        if (sessionId && sessionId.trim().length > 10) {
+          handleOAuthCallback(sessionId);
+        } else {
+          // Clear any invalid hash to prevent confusion
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+      } catch (error) {
+        // If parsing fails, just clear the hash
+        console.log('Invalid URL hash, clearing:', error);
+        window.history.replaceState({}, document.title, window.location.pathname);
       }
     }
   }, []);
