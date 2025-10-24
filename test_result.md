@@ -216,6 +216,44 @@ backend:
         agent: "testing"
         comment: "✅ Activity feed endpoints properly protected with authentication. Backend authentication system working correctly."
 
+
+  - task: "Admin System with is_admin field"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added is_admin field to User model. Created get_admin_user() helper function for admin route protection. Updated /auth/me endpoint to return is_admin status. Added /admin/promote-me endpoint for testing."
+
+  - task: "Admin Lesson Generation API"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Created POST /api/admin/lessons/generate endpoint. Uses Emergent LLM (GPT-4o-mini) to generate lessons based on topic, difficulty, XP, lesson count, and learning objectives. Supports creating lessons for existing skills or creating new skills with lessons. AI generates detailed lesson content with titles, descriptions, estimated time, and resources."
+
+  - task: "Admin Skill Management API"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Created GET /api/admin/skills (get all skills for dropdown), DELETE /api/admin/lessons/{lesson_id}, DELETE /api/admin/skills/{skill_id}, PUT /api/admin/users/{user_id}/toggle-admin endpoints."
+
+
   - task: "Dashboard Stats API"
     implemented: true
     working: true
