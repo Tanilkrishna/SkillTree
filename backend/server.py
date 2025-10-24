@@ -383,7 +383,7 @@ async def complete_lesson(lesson_id: str, request: Request):
     all_lessons = await db.lessons.find({'skill_id': skill_id}, {'_id': 0}).to_list(1000)
     completed_lessons = await db.user_lessons.find({
         'user_id': current_user['id'],
-        'lesson_id': {'$in': [l['id'] for l in all_lessons]},
+        'lesson_id': {'$in': [lesson_item['id'] for lesson_item in all_lessons]},
         'completed': True
     }, {'_id': 0}).to_list(1000)
     
