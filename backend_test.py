@@ -126,6 +126,15 @@ class SkillTreeAPITester:
             data=oauth_data
         )
         
+        # Test /auth/oauth/session fails without session_id
+        self.run_test(
+            "OAuth Session without session_id (Should fail)",
+            "POST",
+            "auth/oauth/session",
+            400,  # Should return 400 for missing session_id
+            data={}
+        )
+        
         # Test /auth/me returns 401 for unauthenticated users
         self.run_test(
             "Get Current User Unauthenticated (Should be 401)",
