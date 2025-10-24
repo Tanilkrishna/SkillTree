@@ -234,15 +234,18 @@ backend:
 
   - task: "Admin Lesson Generation API"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Created POST /api/admin/lessons/generate endpoint. Uses Emergent LLM (GPT-4o-mini) to generate lessons based on topic, difficulty, XP, lesson count, and learning objectives. Supports creating lessons for existing skills or creating new skills with lessons. AI generates detailed lesson content with titles, descriptions, estimated time, and resources."
+      - working: true
+        agent: "testing"
+        comment: "✅ AI LESSON GENERATION WORKING: Fixed critical bugs in lesson generation endpoint. Issues resolved: 1) UnboundLocalError with json import - moved import outside try block. 2) Incorrect LlmChat initialization - fixed to use .with_model() method instead of model parameter. 3) Response parsing - fixed to use str(response) instead of response.content. 4) MongoDB ObjectId serialization - added _id field removal before JSON response. AI lesson generation now successfully creates lessons with proper structure (title, content, estimated_time, resources). Tested both existing skill and new skill creation scenarios. EMERGENT_LLM_KEY working correctly with GPT-4o-mini model."
 
   - task: "Admin Skill Management API"
     implemented: true
