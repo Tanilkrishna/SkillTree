@@ -732,6 +732,9 @@ class SkillTreeAPITester:
         # Test admin AI lesson generation with mock auth
         self.test_admin_ai_lesson_generation_with_mock_auth()
         
+        # Test Emergent LLM integration
+        self.test_emergent_llm_integration()
+        
         # Print summary
         print("\n" + "=" * 70)
         print(f"📊 Test Results: {self.tests_passed}/{self.tests_run} passed")
