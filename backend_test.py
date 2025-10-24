@@ -196,12 +196,173 @@ class SkillTreeAPITester:
         print("\n🌱 Testing Seed Data Endpoint...")
         
         # Seed data should work without authentication
-        self.run_test(
+        success, response_data = self.run_test(
             "Seed Data Endpoint",
             "POST",
             "seed-data",
             200
         )
+        
+        return success
+
+    def test_skills_endpoints_without_auth(self):
+        """Test skills endpoints without authentication (should return 401)"""
+        print("\n🎯 Testing Skills Endpoints Without Auth...")
+        
+        # Test /api/skills (list all skills)
+        self.run_test(
+            "List Skills Unauthenticated (Should be 401)",
+            "GET",
+            "skills",
+            401
+        )
+        
+        # Test /api/user-skills/{skill_id}/start
+        self.run_test(
+            "Start Skill Unauthenticated (Should be 401)",
+            "POST",
+            "user-skills/skill-1/start",
+            401
+        )
+        
+        # Test /api/user-skills/{skill_id}/complete
+        self.run_test(
+            "Complete Skill Unauthenticated (Should be 401)",
+            "POST",
+            "user-skills/skill-1/complete",
+            401
+        )
+        
+        return True
+
+    def test_lessons_endpoints_without_auth(self):
+        """Test lessons endpoints without authentication (should return 401)"""
+        print("\n📚 Testing Lessons Endpoints Without Auth...")
+        
+        # Test /api/skills/{skill_id}/lessons
+        self.run_test(
+            "Get Lessons Unauthenticated (Should be 401)",
+            "GET",
+            "skills/skill-1/lessons",
+            401
+        )
+        
+        # Test /api/lessons/{lesson_id}/complete (this is the endpoint with fixed variable name)
+        self.run_test(
+            "Complete Lesson Unauthenticated (Should be 401)",
+            "POST",
+            "lessons/lesson-1-1/complete",
+            401
+        )
+        
+        return True
+
+    def test_ai_endpoints_without_auth(self):
+        """Test AI endpoints without authentication (should return 401)"""
+        print("\n🤖 Testing AI Endpoints Without Auth...")
+        
+        # Test /api/ai/recommend-skills
+        self.run_test(
+            "AI Recommend Skills Unauthenticated (Should be 401)",
+            "POST",
+            "ai/recommend-skills",
+            401
+        )
+        
+        # Test /api/ai/generate-lesson-content
+        self.run_test(
+            "AI Generate Lesson Content Unauthenticated (Should be 401)",
+            "POST",
+            "ai/generate-lesson-content",
+            401,
+            data={"skill_name": "Python", "lesson_title": "Variables"}
+        )
+        
+        return True
+
+    def test_integrations_endpoints_without_auth(self):
+        """Test integration endpoints without authentication (should return 401)"""
+        print("\n🔗 Testing Integration Endpoints Without Auth...")
+        
+        # Test /api/integrations
+        self.run_test(
+            "Get Integrations Unauthenticated (Should be 401)",
+            "GET",
+            "integrations",
+            401
+        )
+        
+        # Test /api/integrations/{platform}/connect
+        for platform in ['github', 'linkedin', 'youtube']:
+            self.run_test(
+                f"Connect {platform.title()} Unauthenticated (Should be 401)",
+                "POST",
+                f"integrations/{platform}/connect",
+                401,
+                data={}
+            )
+        
+        return True
+
+    def test_dashboard_endpoints_without_auth(self):
+        """Test dashboard endpoints without authentication (should return 401)"""
+        print("\n📊 Testing Dashboard Endpoints Without Auth...")
+        
+        # Test /api/dashboard/stats
+        self.run_test(
+            "Get Dashboard Stats Unauthenticated (Should be 401)",
+            "GET",
+            "dashboard/stats",
+            401
+        )
+        
+        # Test /api/achievements
+        self.run_test(
+            "Get Achievements Unauthenticated (Should be 401)",
+            "GET",
+            "achievements",
+            401
+        )
+        
+        # Test /api/activity-feed
+        self.run_test(
+            "Get Activity Feed Unauthenticated (Should be 401)",
+            "GET",
+            "activity-feed",
+            401
+        )
+        
+        return True
+
+    def test_endpoint_existence(self):
+        """Test that all expected endpoints exist (not 404)"""
+        print("\n🔍 Testing Endpoint Existence...")
+        
+        # These should return 401 (auth required) not 404 (not found)
+        endpoints_to_check = [
+            ("GET", "skills"),
+            ("GET", "skills/skill-1"),
+            ("POST", "user-skills/skill-1/start"),
+            ("POST", "user-skills/skill-1/complete"),
+            ("GET", "skills/skill-1/lessons"),
+            ("POST", "lessons/lesson-1-1/complete"),
+            ("POST", "ai/recommend-skills"),
+            ("POST", "ai/generate-lesson-content"),
+            ("GET", "integrations"),
+            ("POST", "integrations/github/connect"),
+            ("GET", "dashboard/stats"),
+            ("GET", "achievements"),
+            ("GET", "activity-feed")
+        ]
+        
+        for method, endpoint in endpoints_to_check:
+            success, response = self.run_test(
+                f"Endpoint Exists: {method} {endpoint}",
+                method,
+                endpoint,
+                401,  # Should be 401 (auth required), not 404 (not found)
+                data={} if method == "POST" else None
+            )
         
         return True
 
