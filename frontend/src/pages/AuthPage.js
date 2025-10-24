@@ -1,20 +1,15 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { TreePine, Mail, Lock, User, Sparkles } from 'lucide-react';
+import { TreePine, Sparkles } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 const AuthPage = ({ onLogin }) => {
-  const [isLogin, setIsLogin] = useState(true);
-  const [loading, setLoading] = useState(false);
   const [processingOAuth, setProcessingOAuth] = useState(false);
-  const [formData, setFormData] = useState({ email: '', password: '', name: '' });
 
   useEffect(() => {
     // Check for OAuth session_id in URL fragment ONLY if explicitly present
