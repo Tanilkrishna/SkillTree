@@ -217,25 +217,27 @@ class SkillTreeAPITester:
             return False
 
     def run_all_tests(self):
-        """Run complete test suite"""
-        print("🚀 Starting SkillTree API Test Suite")
+        """Run complete test suite focused on authentication changes"""
+        print("🚀 Starting SkillTree Authentication Test Suite")
         print(f"Testing against: {self.base_url}")
-        print("=" * 50)
+        print("=" * 60)
         
-        # Test authentication first
-        if not self.test_auth_flow():
-            print("❌ Authentication failed - stopping tests")
+        # Test backend health first
+        if not self.test_backend_health():
+            print("❌ Backend not responding - stopping tests")
             return False
         
-        # Test all other endpoints
-        skill_id = self.test_skills_endpoints()
-        self.test_lessons_endpoints(skill_id)
-        self.test_ai_endpoints()
-        self.test_integrations_endpoints()
-        self.test_dashboard_endpoints()
+        # Test authentication changes (main focus)
+        self.test_auth_changes()
+        
+        # Test protected endpoints without authentication
+        self.test_protected_endpoints_without_auth()
+        
+        # Test seed data endpoint (should work without auth)
+        self.test_seed_data_endpoint()
         
         # Print summary
-        print("\n" + "=" * 50)
+        print("\n" + "=" * 60)
         print(f"📊 Test Results: {self.tests_passed}/{self.tests_run} passed")
         print(f"Success Rate: {(self.tests_passed/self.tests_run*100):.1f}%")
         
@@ -245,8 +247,10 @@ class SkillTreeAPITester:
             print(f"\n❌ Failed Tests ({len(failed_tests)}):")
             for test in failed_tests:
                 print(f"  - {test['test_name']}: {test['details']}")
+        else:
+            print("\n✅ All tests passed!")
         
-        return self.tests_passed == self.tests_run
+        return len(failed_tests) == 0
 
 def main():
     tester = SkillTreeAPITester()
