@@ -918,6 +918,9 @@ Make sure the content is educational, practical, and appropriate for {data.diffi
         if not response_text:
             raise ValueError("No JSON content found in AI response")
         
+        # Debug: log the extracted JSON for troubleshooting
+        logger.info(f"Extracted JSON for parsing: {response_text[:200]}...")
+        
         lessons_data = json.loads(response_text)
         
         # Store lessons in database
