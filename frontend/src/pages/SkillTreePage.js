@@ -143,13 +143,66 @@ const SkillTreePage = ({ user, onLogout }) => {
 
           {/* AI Recommendations */}
           {recommendations && (
-            <Card className="p-6 bg-white/95 backdrop-blur-sm mb-6" data-testid="recommendations-card">
-              <h3 className="text-xl font-bold mb-3 flex items-center gap-2">
-                <Sparkles className="w-6 h-6 text-purple-500" />
-                AI Skill Recommendations
-              </h3>
-              <div className="prose max-w-none">
-                <p className="whitespace-pre-wrap text-gray-700">{recommendations.recommendations}</p>
+            <Card className="relative overflow-hidden mb-6 border-0 shadow-2xl" data-testid="recommendations-card">
+              {/* Animated gradient background */}
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-pink-500 to-blue-600 opacity-90" />
+              <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djItaDJ2LTJoLTJ6bTAtNHYyaDJ2LTJoLTJ6bTAgNHYyaDJ2LTJoLTJ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-20" />
+              
+              <div className="relative p-8">
+                {/* Header with pulsing AI icon */}
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-white/30 rounded-full blur-xl animate-pulse" />
+                    <div className="relative w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/40">
+                      <Sparkles className="w-7 h-7 text-white animate-pulse" />
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white flex items-center gap-2">
+                      AI Skill Recommendations
+                    </h3>
+                    <p className="text-white/80 text-sm">Powered by advanced AI analysis</p>
+                  </div>
+                </div>
+
+                {/* AI Message Box */}
+                <div className="bg-white/95 backdrop-blur-md rounded-2xl p-6 shadow-xl border border-white/20">
+                  {/* AI Badge */}
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full mb-4">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse" />
+                    <span className="text-xs font-semibold text-purple-700">AI Generated Response</span>
+                  </div>
+
+                  {/* Recommendations Content */}
+                  <div className="prose prose-lg max-w-none">
+                    <div className="text-gray-800 leading-relaxed whitespace-pre-wrap font-medium">
+                      {recommendations.recommendations}
+                    </div>
+                  </div>
+
+                  {/* Decorative elements */}
+                  <div className="mt-6 pt-4 border-t border-gray-200 flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                      <div className="flex gap-1">
+                        {[...Array(3)].map((_, i) => (
+                          <div key={i} className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: `${i * 200}ms` }} />
+                        ))}
+                      </div>
+                      <span>Analyzing your learning path...</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-xs text-gray-400">
+                      <Sparkles className="w-3 h-3" />
+                      <span>AI Powered</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Refresh hint */}
+                <div className="mt-4 text-center">
+                  <p className="text-white/70 text-sm">
+                    💡 Tip: Get new recommendations as you progress in your skills
+                  </p>
+                </div>
               </div>
             </Card>
           )}
