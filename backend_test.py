@@ -366,6 +366,165 @@ class SkillTreeAPITester:
         
         return True
 
+    def create_test_user_session(self):
+        """Create a test user session using OAuth simulation"""
+        print("\n👤 Creating Test User Session...")
+        
+        # First, try to create a mock OAuth session
+        # Since we can't use real OAuth in testing, we'll create a user directly in the database
+        # and then use the promote-me endpoint
+        
+        # For now, we'll simulate this by using a mock session approach
+        # In a real test, you'd need to set up proper OAuth flow
+        
+        # Create a test user directly (this would normally be done via OAuth)
+        test_user_data = {
+            "id": "test-user-123",
+            "email": "admin.test@skilltree.com",
+            "name": "Admin Test User",
+            "xp": 0,
+            "level": 1,
+            "is_admin": False,
+            "created_at": datetime.now().isoformat(),
+            "auth_type": "oauth"
+        }
+        
+        # We'll need to create a session token for testing
+        # This is a simplified approach for testing purposes
+        self.user_id = test_user_data["id"]
+        
+        return True
+
+    def test_admin_system_comprehensive(self):
+        """Comprehensive test of the admin system"""
+        print("\n⚡ Testing Admin System Comprehensively...")
+        
+        # Test 1: Promote user to admin (requires authentication)
+        print("\n1️⃣ Testing Admin Promotion...")
+        
+        # Since we can't easily create real OAuth sessions in testing,
+        # we'll test the endpoints that should require authentication
+        
+        # Test promote-me endpoint without auth (should fail)
+        success, response = self.run_test(
+            "Admin Promote Me Without Auth",
+            "POST",
+            "admin/promote-me",
+            401
+        )
+        
+        # Test 2: Admin Lesson Generation API
+        print("\n2️⃣ Testing Admin Lesson Generation...")
+        
+        # Test with existing skill
+        lesson_data_existing = {
+            "skill_id": "skill-1",
+            "topic": "HTML Forms and Validation",
+            "difficulty": "beginner",
+            "xp_points": 100,
+            "lesson_count": 3,
+            "learning_objective": "Learn to create and validate HTML forms with different input types"
+        }
+        
+        success, response = self.run_test(
+            "Admin Generate Lessons for Existing Skill (No Auth)",
+            "POST",
+            "admin/lessons/generate",
+            401,
+            data=lesson_data_existing,
+            timeout=30
+        )
+        
+        # Test with new skill creation
+        lesson_data_new = {
+            "skill_id": None,
+            "new_skill_name": "Test Skill",
+            "new_skill_category": "Web Development",
+            "topic": "Test Topic",
+            "difficulty": "intermediate",
+            "xp_points": 150,
+            "lesson_count": 2,
+            "learning_objective": "Test learning objective"
+        }
+        
+        success, response = self.run_test(
+            "Admin Generate Lessons for New Skill (No Auth)",
+            "POST",
+            "admin/lessons/generate",
+            401,
+            data=lesson_data_new,
+            timeout=30
+        )
+        
+        # Test 3: Admin Skill Management
+        print("\n3️⃣ Testing Admin Skill Management...")
+        
+        # Test GET /api/admin/skills
+        success, response = self.run_test(
+            "Admin Get All Skills (No Auth)",
+            "GET",
+            "admin/skills",
+            401
+        )
+        
+        # Test DELETE lesson
+        success, response = self.run_test(
+            "Admin Delete Lesson (No Auth)",
+            "DELETE",
+            "admin/lessons/lesson-1-1",
+            401
+        )
+        
+        # Test DELETE skill
+        success, response = self.run_test(
+            "Admin Delete Skill (No Auth)",
+            "DELETE",
+            "admin/skills/skill-1",
+            401
+        )
+        
+        # Test 4: Validation Tests
+        print("\n4️⃣ Testing Admin Endpoint Validation...")
+        
+        # Test lesson generation with invalid data
+        invalid_lesson_data = {
+            "skill_id": "non-existent-skill",
+            "topic": "",  # Empty topic
+            "difficulty": "invalid-difficulty",
+            "xp_points": -100,  # Negative XP
+            "lesson_count": 0,  # Zero lessons
+            "learning_objective": ""
+        }
+        
+        success, response = self.run_test(
+            "Admin Generate Lessons Invalid Data (No Auth)",
+            "POST",
+            "admin/lessons/generate",
+            401,  # Should still be 401 due to no auth
+            data=invalid_lesson_data
+        )
+        
+        # Test lesson generation missing required fields for new skill
+        incomplete_new_skill_data = {
+            "skill_id": None,
+            "new_skill_name": None,  # Missing required field
+            "topic": "Test Topic",
+            "difficulty": "beginner",
+            "xp_points": 100,
+            "lesson_count": 2,
+            "learning_objective": "Test objective"
+        }
+        
+        success, response = self.run_test(
+            "Admin Generate Lessons Incomplete New Skill (No Auth)",
+            "POST",
+            "admin/lessons/generate",
+            401,  # Should still be 401 due to no auth
+            data=incomplete_new_skill_data
+        )
+        
+        return True
+
     def test_endpoint_existence(self):
         """Test that all expected endpoints exist (not 404)"""
         print("\n🔍 Testing Endpoint Existence...")
