@@ -103,24 +103,26 @@
 #====================================================================================================
 
 user_problem_statement: |
-  Build a SaaS web platform called SkillTree, an AI-powered learning and progress-tracking system 
+  **LATEST REQUEST**: Remove Emergent email/password authentication. Use only Google OAuth for login/register.
+  
+  Original request: Build a SaaS web platform called SkillTree, an AI-powered learning and progress-tracking system 
   that visualizes users' skill development as a gamified skill tree. The system connects to external 
   learning sources (GitHub, LinkedIn, YouTube, etc.), recommends next skills using AI, provides 
   in-app lessons, and tracks progress visually. Make sure all functions work properly and update 
   them to the given ones and create if any necessary functions or fields required and make it user friendly.
 
 backend:
-  - task: "Authentication System (Register/Login/JWT)"
+  - task: "Authentication System (Google OAuth Only)"
     implemented: true
     working: true
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: true
         agent: "main"
-        comment: "Implemented complete auth system with JWT, bcrypt password hashing"
+        comment: "UPDATED: Removed email/password authentication. Now using Google OAuth only via Emergent auth service. Removed /auth/register and /auth/login endpoints. Kept /auth/oauth/session, /auth/logout, /auth/me. Removed bcrypt dependency."
 
   - task: "Skills and Skill Tree System"
     implemented: true
