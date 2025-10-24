@@ -53,22 +53,6 @@ const AuthPage = ({ onLogin }) => {
     window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      const endpoint = isLogin ? `${API}/auth/login` : `${API}/auth/register`;
-      const response = await axios.post(endpoint, formData);
-      onLogin(response.data.user, response.data.token);
-      toast.success(isLogin ? 'Welcome back!' : 'Account created successfully!');
-    } catch (error) {
-      toast.error(error.response?.data?.detail || 'Authentication failed');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   if (processingOAuth) {
     return (
       <div className="min-h-screen flex items-center justify-center">
