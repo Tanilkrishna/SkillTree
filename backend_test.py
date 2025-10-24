@@ -63,7 +63,7 @@ class SkillTreeAPITester:
                 try:
                     error_detail = response.json().get('detail', 'No error detail')
                     details += f", Error: {error_detail}"
-                except:
+                except Exception:
                     details += f", Response: {response.text[:200]}"
             
             self.log_test(name, success, details)
@@ -71,7 +71,7 @@ class SkillTreeAPITester:
             if success:
                 try:
                     return True, response.json()
-                except:
+                except Exception:
                     return True, {}
             else:
                 return False, response
