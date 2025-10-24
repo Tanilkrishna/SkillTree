@@ -861,33 +861,16 @@ async def generate_lessons(data: AdminLessonGenerateRequest, request: Request):
             system_message="You are an expert educational content creator. Generate comprehensive, engaging lessons with practical examples and clear explanations."
         ).with_model("openai", "gpt-4o-mini")
         
-        prompt = f"""You are an expert educational content creator. Generate {data.lesson_count} detailed lessons for the following topic:
+        prompt = f"""Generate {data.lesson_count} lessons for: {data.topic} (Level: {data.difficulty})
 
-Topic: {data.topic}
-Difficulty Level: {data.difficulty}
 Learning Objective: {data.learning_objective}
-XP Points per Lesson: {data.xp_points}
 
-Please create {data.lesson_count} comprehensive lessons that progressively build knowledge. For each lesson, provide:
-1. A clear, engaging title
-2. Detailed content (minimum 200 words) with explanations, examples, and code snippets where applicable
-3. Estimated completion time in minutes
-4. 2-3 relevant external resources (with realistic titles and URLs)
+Return ONLY a valid JSON array. Each lesson must have: title, content, estimated_time (number), resources (array).
 
-Format your response as a JSON array with this exact structure:
-[
-  {{
-    "title": "Lesson Title",
-    "content": "Detailed lesson content with examples...",
-    "estimated_time": 30,
-    "resources": [
-      {{"title": "Resource Name", "url": "https://example.com"}},
-      {{"title": "Another Resource", "url": "https://example.com"}}
-    ]
-  }}
-]
+Example format:
+[{{"title":"Lesson 1","content":"Brief educational content about the topic.","estimated_time":25,"resources":[{{"title":"MDN Guide","url":"https://developer.mozilla.org"}}]}}]
 
-Make sure the content is educational, practical, and appropriate for {data.difficulty} level learners."""
+Keep content concise but informative. Use proper JSON escaping for quotes."""
 
         user_message = UserMessage(text=prompt)
         response = await llm.send_message(user_message)
