@@ -133,11 +133,26 @@ const SkillTreePage = ({ user, onLogout }) => {
               size="lg"
               onClick={handleGetRecommendations}
               disabled={loadingRecs}
-              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+              className="relative overflow-hidden bg-gradient-to-r from-purple-600 via-pink-500 to-blue-600 hover:from-purple-700 hover:via-pink-600 hover:to-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 border-0 text-white font-semibold"
               data-testid="get-recommendations-button"
             >
-              <Sparkles className="w-5 h-5 mr-2" />
-              {loadingRecs ? 'Getting Recommendations...' : 'AI Recommendations'}
+              {/* Shimmer effect */}
+              <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+              
+              <div className="relative flex items-center gap-2">
+                {loadingRecs ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span>Analyzing...</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-5 h-5 animate-pulse" />
+                    <span>Get AI Recommendations</span>
+                    <Sparkles className="w-4 h-4 animate-pulse" style={{ animationDelay: '0.5s' }} />
+                  </>
+                )}
+              </div>
             </Button>
           </div>
 
