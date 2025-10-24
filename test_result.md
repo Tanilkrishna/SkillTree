@@ -153,6 +153,9 @@ backend:
       - working: true
         agent: "main"
         comment: "Implemented lessons with progress tracking, completion status"
+      - working: true
+        agent: "testing"
+        comment: "✅ LESSONS ENDPOINTS VERIFIED: All lessons endpoints working correctly after code cleanup. /api/skills/{skill_id}/lessons properly protected (401 without auth). /api/lessons/{lesson_id}/complete endpoint working correctly with FIXED VARIABLE NAME 'lesson_item' (was 'l'). The lesson completion logic now uses proper variable naming and functions without errors. No linting issues found."
 
   - task: "AI Recommendations using Emergent LLM"
     implemented: true
