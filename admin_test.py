@@ -106,11 +106,13 @@ class AdminSystemTester:
             # Insert or update user
             db.users.replace_one({'id': test_user['id']}, test_user, upsert=True)
             
-            # Create session
+            # Create session (expires in 1 hour)
+            from datetime import timedelta
+            expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
             test_session = {
                 'user_id': test_user['id'],
                 'session_token': test_session_token,
-                'expires_at': datetime.now(timezone.utc).isoformat(),
+                'expires_at': expires_at.isoformat(),
                 'created_at': datetime.now(timezone.utc).isoformat()
             }
             
