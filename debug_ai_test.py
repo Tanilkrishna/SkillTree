@@ -13,7 +13,7 @@ def test_ai_endpoints():
     
     print("🔐 Authenticating...")
     response = requests.post(
-        "https://oneshot-run.preview.emergentagent.com/api/auth/register",
+        "https://test-agents-hub.preview.emergentagent.com/api/auth/register",
         json=register_data,
         headers={'Content-Type': 'application/json'},
         timeout=10
@@ -35,7 +35,7 @@ def test_ai_endpoints():
     print("\n🤖 Testing AI Skill Recommendations...")
     try:
         response = requests.post(
-            "https://oneshot-run.preview.emergentagent.com/api/ai/recommend-skills",
+            "https://test-agents-hub.preview.emergentagent.com/api/ai/recommend-skills",
             headers=headers,
             timeout=60  # Long timeout for AI
         )
@@ -59,7 +59,7 @@ def test_ai_endpoints():
         }
         
         response = requests.post(
-            "https://oneshot-run.preview.emergentagent.com/api/ai/generate-lesson-content",
+            "https://test-agents-hub.preview.emergentagent.com/api/ai/generate-lesson-content",
             json=data,
             headers=headers,
             timeout=60  # Long timeout for AI

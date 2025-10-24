@@ -13,7 +13,7 @@ def test_other_endpoints():
     
     print("🔐 Authenticating...")
     response = requests.post(
-        "https://oneshot-run.preview.emergentagent.com/api/auth/register",
+        "https://test-agents-hub.preview.emergentagent.com/api/auth/register",
         json=register_data,
         headers={'Content-Type': 'application/json'},
         timeout=10
@@ -34,7 +34,7 @@ def test_other_endpoints():
     print("\n🏆 Testing Achievements...")
     try:
         response = requests.get(
-            "https://oneshot-run.preview.emergentagent.com/api/achievements",
+            "https://test-agents-hub.preview.emergentagent.com/api/achievements",
             headers=headers,
             timeout=30
         )
@@ -56,7 +56,7 @@ def test_other_endpoints():
     print("\n📈 Testing Activity Feed...")
     try:
         response = requests.get(
-            "https://oneshot-run.preview.emergentagent.com/api/activity-feed",
+            "https://test-agents-hub.preview.emergentagent.com/api/activity-feed",
             headers=headers,
             timeout=30
         )
@@ -77,7 +77,7 @@ def test_other_endpoints():
     print("\n📊 Testing Dashboard Stats...")
     try:
         response = requests.get(
-            "https://oneshot-run.preview.emergentagent.com/api/dashboard/stats",
+            "https://test-agents-hub.preview.emergentagent.com/api/dashboard/stats",
             headers=headers,
             timeout=30
         )
