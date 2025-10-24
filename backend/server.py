@@ -223,7 +223,7 @@ async def start_skill(skill_id: str, current_user: dict = Depends(get_current_us
 
 @api_router.put("/user-skills/{skill_id}/progress")
 async def update_progress(skill_id: str, progress: dict, current_user: dict = Depends(get_current_user)):
-    user_skill = await db.user_skills.find_one({'user_id': current_user['id'], 'skill_id': skill_id})
+    user_skill = await db.user_skills.find_one({'user_id': current_user['id'], 'skill_id': skill_id}, {'_id': 0})
     if not user_skill:
         raise HTTPException(status_code=404, detail="User skill not found")
     
