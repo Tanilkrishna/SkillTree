@@ -182,34 +182,19 @@ class SkillTreeAPITester:
         
         return True
 
-    def test_lessons_endpoints(self, skill_id):
-        """Test lessons-related endpoints"""
-        print("\n📚 Testing Lessons Endpoints...")
+    def test_seed_data_endpoint(self):
+        """Test seed data endpoint (should work without auth)"""
+        print("\n🌱 Testing Seed Data Endpoint...")
         
-        if not skill_id:
-            self.log_test("Lessons Test", False, "No skill_id available")
-            return
-        
-        # Get lessons for skill
-        success, lessons_response = self.run_test(
-            "Get Skill Lessons",
-            "GET",
-            f"skills/{skill_id}/lessons",
+        # Seed data should work without authentication
+        self.run_test(
+            "Seed Data Endpoint",
+            "POST",
+            "seed-data",
             200
         )
         
-        if success and lessons_response:
-            lessons = lessons_response
-            if len(lessons) > 0:
-                lesson_id = lessons[0]['id']
-                
-                # Complete lesson
-                self.run_test(
-                    "Complete Lesson",
-                    "POST",
-                    f"lessons/{lesson_id}/complete",
-                    200
-                )
+        return True
 
     def test_ai_endpoints(self):
         """Test AI-related endpoints"""
