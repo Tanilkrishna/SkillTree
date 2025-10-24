@@ -978,6 +978,14 @@ async def toggle_admin_status(user_id: str, request: Request):
     return {'message': f'User admin status updated', 'is_admin': new_admin_status}
 
 
+@api_router.post("/admin/promote-me")
+async def promote_to_admin(request: Request):
+    """Helper endpoint to promote current user to admin (for testing)"""
+    current_user = await get_current_user_from_request(request)
+    await db.users.update_one({'id': current_user['id']}, {'$set': {'is_admin': True}})
+    return {'message': 'You are now an admin!', 'is_admin': True}
+
+
 # Include the router
 app.include_router(api_router)
 
