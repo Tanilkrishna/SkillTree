@@ -448,6 +448,44 @@ async def get_dashboard_stats(current_user: dict = Depends(get_current_user)):
         'completion_rate': round((completed / total_skills * 100), 1) if total_skills > 0 else 0
     }
 
+# ============= ACHIEVEMENTS & ACTIVITY =============
+@api_router.get("/achievements")
+async def get_achievements(current_user: dict = Depends(get_current_user)):
+    user_skills = await db.user_skills.find({'user_id': current_user['id']}, {'_id': 0}).to_list(1000)
+    completed = len([us for us in user_skills if us['status'] == 'completed'])
+    
+    achievements = [
+        {'id': 'first_skill', 'name': 'First Steps', 'description': 'Complete your first skill', 'icon': 'Trophy', 'unlocked': completed >= 1},
+        {'id': 'three_skills', 'name': 'On a Roll', 'description': 'Complete 3 skills', 'icon': 'Award', 'unlocked': completed >= 3},
+        {'id': 'five_skills', 'name': 'Rising Star', 'description': 'Complete 5 skills', 'icon': 'Star', 'unlocked': completed >= 5},
+        {'id': 'level_5', 'name': 'Expert Learner', 'description': 'Reach level 5', 'icon': 'Zap', 'unlocked': current_user['level'] >= 5},
+        {'id': 'all_categories', 'name': 'Jack of All Trades', 'description': 'Complete skills in all categories', 'icon': 'Layers', 'unlocked': False},
+    ]
+    
+    return achievements
+
+@api_router.get("/activity-feed")
+async def get_activity_feed(current_user: dict = Depends(get_current_user)):
+    # Get recent completed skills
+    user_skills = await db.user_skills.find(
+        {'user_id': current_user['id'], 'status': 'completed'}, 
+        {'_id': 0}
+    ).sort('completed_at', -1).limit(10).to_list(10)
+    
+    activities = []
+    for us in user_skills:
+        skill = await db.skills.find_one({'id': us['skill_id']}, {'_id': 0})
+        if skill:
+            activities.append({
+                'type': 'skill_completed',
+                'title': f'Completed {skill["name"]}',
+                'description': f'Earned {skill["xp_value"]} XP',
+                'timestamp': us['completed_at'],
+                'icon': 'CheckCircle'
+            })
+    
+    return activities
+
 # ============= SEED DATA ROUTE =============
 @api_router.post("/seed-data")
 async def seed_data():
@@ -456,31 +494,62 @@ async def seed_data():
     if existing_skills > 0:
         return {'message': 'Data already seeded'}
     
-    # Seed skills with tree structure
+    # Comprehensive skill tree with multiple paths
     skills_data = [
-        {'id': 'skill-1', 'name': 'HTML Basics', 'description': 'Learn the fundamentals of HTML', 'category': 'Web Development', 'difficulty': 'beginner', 'prerequisites': [], 'xp_value': 100, 'icon': 'Code', 'position': {'x': 0, 'y': 0}},
-        {'id': 'skill-2', 'name': 'CSS Fundamentals', 'description': 'Master styling with CSS', 'category': 'Web Development', 'difficulty': 'beginner', 'prerequisites': ['skill-1'], 'xp_value': 150, 'icon': 'Palette', 'position': {'x': 1, 'y': 0}},
-        {'id': 'skill-3', 'name': 'JavaScript Basics', 'description': 'Introduction to JavaScript programming', 'category': 'Programming', 'difficulty': 'beginner', 'prerequisites': ['skill-1'], 'xp_value': 200, 'icon': 'Code2', 'position': {'x': 0, 'y': 1}},
-        {'id': 'skill-4', 'name': 'React Fundamentals', 'description': 'Build UIs with React', 'category': 'Web Development', 'difficulty': 'intermediate', 'prerequisites': ['skill-2', 'skill-3'], 'xp_value': 300, 'icon': 'Component', 'position': {'x': 1, 'y': 1}},
-        {'id': 'skill-5', 'name': 'Python Basics', 'description': 'Learn Python programming', 'category': 'Programming', 'difficulty': 'beginner', 'prerequisites': [], 'xp_value': 200, 'icon': 'Code', 'position': {'x': 2, 'y': 0}},
-        {'id': 'skill-6', 'name': 'FastAPI', 'description': 'Build APIs with FastAPI', 'category': 'Backend', 'difficulty': 'intermediate', 'prerequisites': ['skill-5'], 'xp_value': 300, 'icon': 'Server', 'position': {'x': 2, 'y': 1}},
-        {'id': 'skill-7', 'name': 'MongoDB', 'description': 'NoSQL database fundamentals', 'category': 'Database', 'difficulty': 'intermediate', 'prerequisites': ['skill-5'], 'xp_value': 250, 'icon': 'Database', 'position': {'x': 3, 'y': 1}},
-        {'id': 'skill-8', 'name': 'Full-Stack Project', 'description': 'Build a complete application', 'category': 'Project', 'difficulty': 'advanced', 'prerequisites': ['skill-4', 'skill-6', 'skill-7'], 'xp_value': 500, 'icon': 'Rocket', 'position': {'x': 2, 'y': 2}},
+        # Web Development Path
+        {'id': 'skill-1', 'name': 'HTML Basics', 'description': 'Learn the fundamentals of HTML markup language', 'category': 'Web Development', 'difficulty': 'beginner', 'prerequisites': [], 'xp_value': 100, 'icon': 'Code', 'position': {'x': 0, 'y': 0}},
+        {'id': 'skill-2', 'name': 'CSS Fundamentals', 'description': 'Master styling with CSS and create beautiful designs', 'category': 'Web Development', 'difficulty': 'beginner', 'prerequisites': ['skill-1'], 'xp_value': 150, 'icon': 'Palette', 'position': {'x': 1, 'y': 0}},
+        {'id': 'skill-3', 'name': 'JavaScript Basics', 'description': 'Introduction to JavaScript programming', 'category': 'Web Development', 'difficulty': 'beginner', 'prerequisites': ['skill-1'], 'xp_value': 200, 'icon': 'Code2', 'position': {'x': 0, 'y': 1}},
+        {'id': 'skill-4', 'name': 'Responsive Design', 'description': 'Build mobile-friendly websites', 'category': 'Web Development', 'difficulty': 'intermediate', 'prerequisites': ['skill-2'], 'xp_value': 200, 'icon': 'Smartphone', 'position': {'x': 2, 'y': 0}},
+        {'id': 'skill-5', 'name': 'React Fundamentals', 'description': 'Build modern UIs with React', 'category': 'Web Development', 'difficulty': 'intermediate', 'prerequisites': ['skill-3'], 'xp_value': 300, 'icon': 'Component', 'position': {'x': 1, 'y': 1}},
+        {'id': 'skill-6', 'name': 'Advanced React', 'description': 'Hooks, Context, and Performance', 'category': 'Web Development', 'difficulty': 'advanced', 'prerequisites': ['skill-5'], 'xp_value': 400, 'icon': 'Layers', 'position': {'x': 2, 'y': 1}},
+        
+        # Backend Path
+        {'id': 'skill-7', 'name': 'Python Basics', 'description': 'Learn Python programming fundamentals', 'category': 'Backend', 'difficulty': 'beginner', 'prerequisites': [], 'xp_value': 200, 'icon': 'Code', 'position': {'x': 4, 'y': 0}},
+        {'id': 'skill-8', 'name': 'Python OOP', 'description': 'Object-Oriented Programming in Python', 'category': 'Backend', 'difficulty': 'intermediate', 'prerequisites': ['skill-7'], 'xp_value': 250, 'icon': 'Box', 'position': {'x': 5, 'y': 0}},
+        {'id': 'skill-9', 'name': 'FastAPI', 'description': 'Build REST APIs with FastAPI', 'category': 'Backend', 'difficulty': 'intermediate', 'prerequisites': ['skill-8'], 'xp_value': 300, 'icon': 'Server', 'position': {'x': 4, 'y': 1}},
+        {'id': 'skill-10', 'name': 'API Security', 'description': 'Authentication & Authorization', 'category': 'Backend', 'difficulty': 'advanced', 'prerequisites': ['skill-9'], 'xp_value': 350, 'icon': 'Shield', 'position': {'x': 5, 'y': 1}},
+        
+        # Database Path
+        {'id': 'skill-11', 'name': 'SQL Basics', 'description': 'Relational database fundamentals', 'category': 'Database', 'difficulty': 'beginner', 'prerequisites': [], 'xp_value': 180, 'icon': 'Database', 'position': {'x': 7, 'y': 0}},
+        {'id': 'skill-12', 'name': 'MongoDB', 'description': 'NoSQL database with MongoDB', 'category': 'Database', 'difficulty': 'intermediate', 'prerequisites': ['skill-11'], 'xp_value': 250, 'icon': 'Database', 'position': {'x': 6, 'y': 1}},
+        {'id': 'skill-13', 'name': 'Database Design', 'description': 'Schema design and optimization', 'category': 'Database', 'difficulty': 'advanced', 'prerequisites': ['skill-12'], 'xp_value': 300, 'icon': 'GitBranch', 'position': {'x': 7, 'y': 1}},
+        
+        # Data Science Path
+        {'id': 'skill-14', 'name': 'Data Analysis', 'description': 'Analyze data with Python', 'category': 'Data Science', 'difficulty': 'intermediate', 'prerequisites': ['skill-7'], 'xp_value': 280, 'icon': 'BarChart', 'position': {'x': 4, 'y': 2}},
+        {'id': 'skill-15', 'name': 'Machine Learning', 'description': 'Build ML models with scikit-learn', 'category': 'Data Science', 'difficulty': 'advanced', 'prerequisites': ['skill-14'], 'xp_value': 450, 'icon': 'Brain', 'position': {'x': 5, 'y': 2}},
+        
+        # DevOps Path
+        {'id': 'skill-16', 'name': 'Git & GitHub', 'description': 'Version control with Git', 'category': 'DevOps', 'difficulty': 'beginner', 'prerequisites': [], 'xp_value': 150, 'icon': 'GitBranch', 'position': {'x': 9, 'y': 0}},
+        {'id': 'skill-17', 'name': 'Docker Basics', 'description': 'Containerization with Docker', 'category': 'DevOps', 'difficulty': 'intermediate', 'prerequisites': ['skill-16'], 'xp_value': 320, 'icon': 'Package', 'position': {'x': 9, 'y': 1}},
+        {'id': 'skill-18', 'name': 'CI/CD', 'description': 'Continuous Integration & Deployment', 'category': 'DevOps', 'difficulty': 'advanced', 'prerequisites': ['skill-17'], 'xp_value': 400, 'icon': 'RefreshCw', 'position': {'x': 9, 'y': 2}},
+        
+        # Projects
+        {'id': 'skill-19', 'name': 'Portfolio Website', 'description': 'Build your personal portfolio', 'category': 'Projects', 'difficulty': 'intermediate', 'prerequisites': ['skill-4', 'skill-5'], 'xp_value': 350, 'icon': 'Globe', 'position': {'x': 2, 'y': 2}},
+        {'id': 'skill-20', 'name': 'Full-Stack App', 'description': 'Complete CRUD application', 'category': 'Projects', 'difficulty': 'advanced', 'prerequisites': ['skill-6', 'skill-9', 'skill-12'], 'xp_value': 600, 'icon': 'Rocket', 'position': {'x': 5, 'y': 3}},
     ]
     
     await db.skills.insert_many(skills_data)
     
-    # Seed lessons
+    # Comprehensive lessons
     lessons_data = [
-        {'id': 'lesson-1-1', 'skill_id': 'skill-1', 'title': 'Introduction to HTML', 'content': 'HTML (HyperText Markup Language) is the standard markup language for creating web pages...', 'order': 1, 'estimated_time': 15},
-        {'id': 'lesson-1-2', 'skill_id': 'skill-1', 'title': 'HTML Tags and Elements', 'content': 'HTML uses tags to define elements. Tags are enclosed in angle brackets...', 'order': 2, 'estimated_time': 20},
-        {'id': 'lesson-1-3', 'skill_id': 'skill-1', 'title': 'HTML Document Structure', 'content': 'Every HTML document has a basic structure with DOCTYPE, html, head, and body tags...', 'order': 3, 'estimated_time': 25},
+        # HTML Basics lessons
+        {'id': 'lesson-1-1', 'skill_id': 'skill-1', 'title': 'Introduction to HTML', 'content': 'HTML (HyperText Markup Language) is the standard markup language for creating web pages. It describes the structure of web content using elements and tags.\n\nKey Concepts:\n- HTML defines the structure of web content\n- Elements are defined by tags\n- Tags tell the browser how to display content\n- HTML5 is the latest version', 'order': 1, 'estimated_time': 15},
+        {'id': 'lesson-1-2', 'skill_id': 'skill-1', 'title': 'HTML Tags and Elements', 'content': 'HTML uses tags to define elements. Tags are enclosed in angle brackets like <tag>.\n\nCommon Tags:\n- <h1> to <h6>: Headings\n- <p>: Paragraphs\n- <a>: Links\n- <img>: Images\n- <div>: Containers\n- <span>: Inline containers', 'order': 2, 'estimated_time': 20},
+        {'id': 'lesson-1-3', 'skill_id': 'skill-1', 'title': 'HTML Document Structure', 'content': 'Every HTML document has a basic structure:\n\n<!DOCTYPE html>\n<html>\n<head>\n  <title>Page Title</title>\n</head>\n<body>\n  Content goes here\n</body>\n</html>\n\nThe DOCTYPE tells browsers this is HTML5.', 'order': 3, 'estimated_time': 25},
         
-        {'id': 'lesson-2-1', 'skill_id': 'skill-2', 'title': 'CSS Basics', 'content': 'CSS (Cascading Style Sheets) is used to style HTML elements...', 'order': 1, 'estimated_time': 20},
-        {'id': 'lesson-2-2', 'skill_id': 'skill-2', 'title': 'CSS Selectors', 'content': 'CSS selectors allow you to target specific HTML elements for styling...', 'order': 2, 'estimated_time': 25},
+        # CSS lessons
+        {'id': 'lesson-2-1', 'skill_id': 'skill-2', 'title': 'CSS Basics', 'content': 'CSS (Cascading Style Sheets) is used to style HTML elements. It controls colors, fonts, layouts, and more.\n\nBasic Syntax:\nselector {\n  property: value;\n}\n\nExample:\nh1 {\n  color: blue;\n  font-size: 24px;\n}', 'order': 1, 'estimated_time': 20},
+        {'id': 'lesson-2-2', 'skill_id': 'skill-2', 'title': 'CSS Selectors', 'content': 'CSS selectors target HTML elements:\n\n- Element: p { }\n- Class: .classname { }\n- ID: #idname { }\n- Descendant: div p { }\n- Child: div > p { }\n- Attribute: [type="text"] { }', 'order': 2, 'estimated_time': 25},
+        {'id': 'lesson-2-3', 'skill_id': 'skill-2', 'title': 'CSS Box Model', 'content': 'The box model consists of:\n- Content: The actual content\n- Padding: Space around content\n- Border: Surrounds padding\n- Margin: Space outside border\n\nUnderstanding this is crucial for layouts!', 'order': 3, 'estimated_time': 30},
         
-        {'id': 'lesson-3-1', 'skill_id': 'skill-3', 'title': 'JavaScript Introduction', 'content': 'JavaScript is a programming language that adds interactivity to web pages...', 'order': 1, 'estimated_time': 20},
-        {'id': 'lesson-3-2', 'skill_id': 'skill-3', 'title': 'Variables and Data Types', 'content': 'JavaScript variables can hold different types of data...', 'order': 2, 'estimated_time': 30},
+        # JavaScript lessons
+        {'id': 'lesson-3-1', 'skill_id': 'skill-3', 'title': 'JavaScript Introduction', 'content': 'JavaScript is a programming language that adds interactivity to web pages. It runs in the browser and can manipulate HTML and CSS.\n\nKey Features:\n- Dynamic typing\n- Event-driven\n- Runs in browser\n- Can manipulate DOM', 'order': 1, 'estimated_time': 20},
+        {'id': 'lesson-3-2', 'skill_id': 'skill-3', 'title': 'Variables and Data Types', 'content': 'JavaScript variables:\n\nlet name = "John";  // String\nconst age = 25;     // Number\nlet isActive = true; // Boolean\nlet items = [];     // Array\nlet person = {};    // Object\n\nUse let for variables, const for constants.', 'order': 2, 'estimated_time': 30},
+        
+        # Python lessons
+        {'id': 'lesson-7-1', 'skill_id': 'skill-7', 'title': 'Python Basics', 'content': 'Python is a versatile programming language known for its readability.\n\nBasic Syntax:\nprint("Hello, World!")\n\nname = "Alice"\nage = 30\n\nif age > 18:\n    print("Adult")\n\nPython uses indentation for code blocks!', 'order': 1, 'estimated_time': 25},
+        {'id': 'lesson-7-2', 'skill_id': 'skill-7', 'title': 'Python Data Structures', 'content': 'Python Data Structures:\n\nList: [1, 2, 3]\nTuple: (1, 2, 3)\nDict: {"key": "value"}\nSet: {1, 2, 3}\n\nLists are mutable, tuples are immutable.', 'order': 2, 'estimated_time': 30},
     ]
     
     await db.lessons.insert_many(lessons_data)
