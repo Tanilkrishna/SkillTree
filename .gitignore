@@ -88,3 +88,7 @@ App.zip
 *.env.*
 app.zip
 .env
+-e 
+# Environment files
+*.env
+*.env.*
