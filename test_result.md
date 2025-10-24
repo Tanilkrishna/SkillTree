@@ -226,15 +226,18 @@ backend:
 frontend:
   - task: "Authentication Page (Google OAuth Only)"
     implemented: true
-    working: true
+    working: false
     file: "frontend/src/pages/AuthPage.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "UPDATED: Simplified auth page to only show Google OAuth login. Removed email/password forms, removed login/register tabs. Clean UI with single 'Continue with Google' button. OAuth callback handling intact."
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL INFRASTRUCTURE ISSUE: Preview URL (https://dev-journey-103.preview.emergentagent.com/auth) is not serving the SkillTree application. Instead showing Emergent preview loading page with 'Wake up servers' button and Flappy Bird game. Local services (frontend, backend, mongodb) are running correctly via supervisorctl. Frontend compiles successfully on localhost:3000. Issue is with preview environment deployment/routing - SkillTree React app not being served at the public URL. This is an infrastructure/deployment issue, not a code issue."
 
   - task: "Dashboard with Stats and Achievements"
     implemented: true
