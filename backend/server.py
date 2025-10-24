@@ -920,6 +920,8 @@ Keep content concise but informative. Use proper JSON escaping for quotes."""
                 'resources': lesson_data.get('resources', [])
             }
             await db.lessons.insert_one(lesson_doc)
+            # Remove MongoDB _id field for JSON serialization
+            lesson_doc.pop('_id', None)
             generated_lessons.append(lesson_doc)
         
         return {
